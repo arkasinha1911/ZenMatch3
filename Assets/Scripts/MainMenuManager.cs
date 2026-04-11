@@ -9,6 +9,9 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("The panel containing your LevelSelectUI script and button container.")]
     public GameObject levelSelectPanel;
 
+    [Tooltip("The panel containing your Settings/Audio controls.")]
+    public GameObject settingsPanel;
+
     [Header("Gameplay Connections")]
     [Tooltip("Drag your GridSpawner here so we can turn it off while in the menu.")]
     public GridSpawner gridSpawner;
@@ -32,6 +35,7 @@ public class MainMenuManager : MonoBehaviour
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
 
         // Turn gameplay ON
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(true);
@@ -39,12 +43,13 @@ public class MainMenuManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Attach this to your back button.
+    /// Attach this to your back button or main menu.
     /// </summary>
     public void ShowMainMenu()
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
 
         // Turn gameplay OFF
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
@@ -58,6 +63,21 @@ public class MainMenuManager : MonoBehaviour
     {
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(true);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+
+        // Turn gameplay OFF
+        if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
+        if (levelManager != null) levelManager.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Attach this to your Settings button!
+    /// </summary>
+    public void ShowSettings()
+    {
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(true);
 
         // Turn gameplay OFF
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);

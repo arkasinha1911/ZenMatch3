@@ -38,6 +38,8 @@ public class AudioManager : MonoBehaviour
             backgroundMusicSource.loop = true;
             backgroundMusicSource.Play();
         }
+        
+        ApplySavedVolume();
     }
 
     public void PlaySwapAudio()
@@ -62,5 +64,22 @@ public class AudioManager : MonoBehaviour
         {
             Debug.LogWarning("AudioManager: Cannot play MatchAudio because SFX Source is not assigned!");
         }
+    }
+
+    /// <summary>
+    /// Attach this to your Slider's 'OnValueChanged (Single)' event!
+    /// </summary>
+    public void SetVolume(float volume)
+    {
+        AudioListener.volume = volume;
+        PlayerPrefs.SetFloat("MasterVolume", volume);
+        PlayerPrefs.Save();
+    }
+
+    public void ApplySavedVolume()
+    {
+        // Default to full volume (1.0f) if they haven't saved a setting yet
+        float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
+        AudioListener.volume = savedVolume;
     }
 }
