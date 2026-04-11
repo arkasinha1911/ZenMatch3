@@ -67,6 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "ZenMatch.slnx",
+    "dotnet.defaultSolution": "ZenMatch3.slnx",
     "dotnet.enableWorkspaceBasedDevelopment": false
 }

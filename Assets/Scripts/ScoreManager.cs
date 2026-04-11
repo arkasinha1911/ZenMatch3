@@ -11,6 +11,7 @@ public class ScoreManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
 
     private int currentScore = 0;
+    public int CurrentScore => currentScore;
 
     private void Awake()
     {

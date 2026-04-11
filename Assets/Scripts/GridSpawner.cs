@@ -358,6 +358,11 @@ public class GridSpawner : MonoBehaviour
             AudioManager.Instance.PlayMatchAudio();
         }
 
+        if (CameraShake.Instance != null)
+        {
+            CameraShake.Instance.Shake();
+        }
+
         yield return new WaitForSeconds(0.1f);
 
         // Resume standard resolution loop since the board is now missing pieces

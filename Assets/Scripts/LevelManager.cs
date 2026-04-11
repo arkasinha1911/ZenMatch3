@@ -60,6 +60,20 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        if (ProgressionManager.Instance != null)
+        {
+            int level = ProgressionManager.Instance.currentPlayingLevel;
+            
+            // Scale time: Starts at ~60s, gets shorter each level (minimum 30s)
+            countdownTimer = Mathf.Max(30f, 60f - (level * 1.5f));
+            
+            // Scale targets: each target requires more as level increases
+            foreach (var target in targets)
+            {
+                target.amountRequired = 10 + (level * 3);
+            }
+        }
+
         IsGameActive = true;
         Time.timeScale = 1f;
 
@@ -232,6 +246,21 @@ public class LevelManager : MonoBehaviour
         IsGameActive = false;
         if (gameWinPanel != null) gameWinPanel.SetActive(true);
         Time.timeScale = 0f; // Pauses physics and interaction
+        
+        if (ProgressionManager.Instance != null)
+        {
+            // Unlock the next level
+            ProgressionManager.Instance.UnlockLevel(ProgressionManager.Instance.currentPlayingLevel + 1);
+            
+            // Save the high score for this level
+            if (ScoreManager.Instance != null)
+            {
+                ProgressionManager.Instance.SaveHighScore(
+                    ProgressionManager.Instance.currentPlayingLevel, 
+                    ScoreManager.Instance.CurrentScore
+                );
+            }
+        }
     }
 
     private void TriggerGameOver()
@@ -247,6 +276,11 @@ public class LevelManager : MonoBehaviour
     public void LoadNextLevel()
     {
         Debug.Log("Next Level Button Clicked!");
+        
+        if (ProgressionManager.Instance != null)
+        {
+            ProgressionManager.Instance.currentPlayingLevel++;
+        }
         
         // CLEAR the static seeds so the game successfully generates a brand new level!
         GridSpawner.forcedNoiseOffset = null;
