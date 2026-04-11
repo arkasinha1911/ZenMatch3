@@ -12,6 +12,9 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("The panel containing your Settings/Audio controls.")]
     public GameObject settingsPanel;
 
+    [Tooltip("A panel containing your Score, Timer, and Target UI to hide during menus.")]
+    public GameObject gameHUDPanel;
+
     [Header("Gameplay Connections")]
     [Tooltip("Drag your GridSpawner here so we can turn it off while in the menu.")]
     public GridSpawner gridSpawner;
@@ -40,6 +43,7 @@ public class MainMenuManager : MonoBehaviour
         // Turn gameplay ON
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(true);
         if (levelManager != null) levelManager.gameObject.SetActive(true);
+        if (gameHUDPanel != null) gameHUDPanel.SetActive(true);
     }
 
     /// <summary>
@@ -54,6 +58,7 @@ public class MainMenuManager : MonoBehaviour
         // Turn gameplay OFF
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
         if (levelManager != null) levelManager.gameObject.SetActive(false);
+        if (gameHUDPanel != null) gameHUDPanel.SetActive(false);
     }
 
     /// <summary>
@@ -68,6 +73,7 @@ public class MainMenuManager : MonoBehaviour
         // Turn gameplay OFF
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
         if (levelManager != null) levelManager.gameObject.SetActive(false);
+        if (gameHUDPanel != null) gameHUDPanel.SetActive(false);
     }
 
     /// <summary>
@@ -82,5 +88,6 @@ public class MainMenuManager : MonoBehaviour
         // Turn gameplay OFF
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
         if (levelManager != null) levelManager.gameObject.SetActive(false);
+        if (gameHUDPanel != null) gameHUDPanel.SetActive(false);
     }
 }
