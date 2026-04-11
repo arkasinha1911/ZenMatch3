@@ -15,7 +15,7 @@ public class LevelSelectUI : MonoBehaviour
     [Tooltip("The exact name or index of your gameplay scene to load.")]
     public string gameplaySceneName = "SampleScene";
 
-    private void Start()
+    private void OnEnable()
     {
         GenerateLevelButtons();
     }
@@ -91,6 +91,7 @@ public class LevelSelectUI : MonoBehaviour
             // Clear prior seeds to prevent map copying from earlier session
             LevelManager.forcedTargetPieceTypes = null;
             
+            ProgressionManager.Instance.returnToMenu = false;
             SceneManager.LoadScene(gameplaySceneName);
         }
         else

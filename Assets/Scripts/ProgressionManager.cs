@@ -8,6 +8,9 @@ public class ProgressionManager : MonoBehaviour
     public int currentPlayingLevel = 1;
     public int highestUnlockedLevel = 1;
 
+    [HideInInspector]
+    public bool returnToMenu = true;
+
     private const string UNLOCKED_LEVEL_KEY = "HighestUnlockedLevel";
 
     private void Awake()
