@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI; // Allows us to control Buttons via code
 
 /// <summary>
 /// This script manages the Main Menu experience before the gameplay actually starts.
@@ -11,8 +12,14 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("The main menu screen containing the giant Play button and title.")]
     public GameObject mainMenuPanel;
 
+    [Tooltip("Drag the actual Play Button GameObject here to automatically hook it up via code!")]
+    public Button playButton;
+
     [Tooltip("The panel containing your LevelSelectUI script and the grid of unlocked level buttons.")]
     public GameObject levelSelectPanel;
+
+    [Tooltip("The standalone ScrollView object. Link this here to guarantee it turns on/off correctly!")]
+    public GameObject levelScrollView;
 
     [Tooltip("The panel containing your Settings and Audio slider controls.")]
     public GameObject settingsPanel;
@@ -33,6 +40,13 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     private void Start()
     {
+        // 0. Automatically wire up the Play button click event via code!
+        if (playButton != null)
+        {
+            // This code tells the button: "When you are clicked, run ShowLevelSelect()"
+            playButton.onClick.AddListener(ShowLevelSelect);
+        }
+
         // 1. Check with the ProgressionManager (our permanent memory module).
         // If 'returnToMenu' is FALSE, it means the player clicked "Restart Level" or "Next Level" and we should bypass the menu entirely!
         if (ProgressionManager.Instance != null && !ProgressionManager.Instance.returnToMenu)
@@ -55,6 +69,7 @@ public class MainMenuManager : MonoBehaviour
         // Safely turn off all menu screens (if they are assigned in the Inspector)
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
+        if (levelScrollView != null) levelScrollView.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
         // Turn gameplay ON! 
@@ -72,6 +87,7 @@ public class MainMenuManager : MonoBehaviour
         // Turn ON just the Main Menu panel, turn OFF everything else.
         if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
+        if (levelScrollView != null) levelScrollView.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
         // Turn gameplay OFF! 
@@ -89,6 +105,7 @@ public class MainMenuManager : MonoBehaviour
         // Hide the title screen, show the level select screen.
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(true);
+        if (levelScrollView != null) levelScrollView.SetActive(true);
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
         // Keep gameplay OFF so timers don't tick down while they pick a level.
@@ -105,6 +122,7 @@ public class MainMenuManager : MonoBehaviour
         // Hide the title screen, show the settings screen.
         if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
         if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
+        if (levelScrollView != null) levelScrollView.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(true);
 
         // Keep gameplay OFF.

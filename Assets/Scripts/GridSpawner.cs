@@ -70,6 +70,10 @@ public class GridSpawner : MonoBehaviour
     public GameObject verticalBombPrefab;
     public GameObject colorBombPrefab;
 
+    [Header("Visual Effects")]
+    [Tooltip("The particle system prefab to spawn when pieces are destroyed!")]
+    public GameObject explosionParticlePrefab;
+
     // ---------------------------------------------------------
     // INTERNAL MEMORY
     // ---------------------------------------------------------
@@ -445,6 +449,12 @@ public class GridSpawner : MonoBehaviour
                     LevelManager.Instance.ReportPieceDestroyed(match.pieceType);
                 }
 
+                // Trigger the particle explosion!
+                if (explosionParticlePrefab != null)
+                {
+                    Instantiate(explosionParticlePrefab, match.gameObject.transform.position, Quaternion.identity);
+                }
+
                 // Delete it from the spreadsheet
                 grid[match.x, match.y] = null;
                 
@@ -610,6 +620,12 @@ public class GridSpawner : MonoBehaviour
                         if (LevelManager.Instance != null && match.pieceType >= 0)
                         {
                             LevelManager.Instance.ReportPieceDestroyed(match.pieceType);
+                        }
+
+                        // Trigger the particle explosion!
+                        if (explosionParticlePrefab != null)
+                        {
+                            Instantiate(explosionParticlePrefab, match.gameObject.transform.position, Quaternion.identity);
                         }
 
                         // Wipe from memory and reality.
