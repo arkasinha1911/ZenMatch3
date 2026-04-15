@@ -1,0 +1,142 @@
+/* Main aesthetic for ZenMatch3 */
+:root {
+    -unity-font-definition: initial;
+    /* Use dynamic pastel colors that match our Zen vibe */
+    --background-color: #f7f3ed;
+    --panel-background: rgba(255, 255, 255, 0.85);
+    --button-background: #aec5eb;
+    --button-hover: #98b3de;
+    --button-active: #82a0cc;
+    --button-disabled: #d8dee8;
+    --text-color: #2c3e50;
+    --border-radius: 15px;
+}
+
+.fullscreen-panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-color);
+}
+
+.transparent-panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+    background-color: var(--panel-background);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    align-items: center;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.title-text {
+    font-size: 64px;
+    -unity-font-style: bold;
+    color: var(--text-color);
+    margin-bottom: 40px;
+}
+
+.heading-text {
+    font-size: 36px;
+    -unity-font-style: bold;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.standard-button {
+    background-color: var(--button-background);
+    border-radius: var(--border-radius);
+    color: white;
+    font-size: 24px;
+    -unity-font-style: bold;
+    padding: 15px 40px;
+    border-width: 0;
+    margin: 10px;
+    transition: scale 0.1s;
+}
+
+.standard-button:hover {
+    background-color: var(--button-hover);
+    scale: 1.05;
+}
+
+.standard-button:active {
+    background-color: var(--button-active);
+    scale: 0.95;
+}
+
+.standard-button:disabled {
+    background-color: var(--button-disabled);
+    color: rgba(255,255,255,0.5);
+}
+
+.hud-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.timer-text {
+    font-size: 32px;
+    -unity-font-style: bold;
+    color: white;
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.5);
+}
+
+.target-list {
+    flex-direction: row;
+}
+
+/* Individual Objective Layout */
+.objective-container {
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--panel-background);
+    border-radius: 10px;
+    padding: 5px 15px;
+    margin-left: 10px;
+}
+
+.objective-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+}
+
+.objective-text {
+    font-size: 20px;
+    color: var(--text-color);
+    -unity-font-style: bold;
+}
+
+/* Level Button specific css */
+.level-button {
+    width: 200px;
+    height: 100px;
+}
+
+.level-button-text {
+    font-size: 24px;
+    -unity-font-style: bold;
+}
+
+.level-button-score {
+    font-size: 14px;
+    margin-top: 5px;
+}

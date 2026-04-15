@@ -1,0 +1,44 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles.uss?fileID=7433441132597879392&amp;guid=f260423968c92614cb85e6a4e86b10ed&amp;type=3#Styles"/>
+    <engine:VisualElement name="root" style="flex-grow: 1;">
+        <engine:VisualElement name="mainMenuPanel" class="fullscreen-panel">
+            <engine:Label text="ZenMatch" class="title-text"/>
+            <engine:Button name="playButton" text="Play" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 190px; letter-spacing: 5px; background-image: none; color: rgb(7, 33, 84);"/>
+            <engine:Button name="settingsOpenButton" text="Settings" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 75px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
+            <engine:Button name="exitButton" text="Exit" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 75px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
+        </engine:VisualElement>
+        <engine:VisualElement name="levelSelectPanel" class="fullscreen-panel" style="display: none;">
+            <engine:Label text="Select Level" class="heading-text"/>
+            <engine:ScrollView name="levelScrollView" style="flex-grow: 1; align-self: stretch; margin: 20px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84);"/>
+            <engine:Button name="backToMenuButton" text="Back" class="standard-button" style="margin-bottom: 20px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84);"/>
+        </engine:VisualElement>
+        <engine:VisualElement name="settingsPanel" class="fullscreen-panel" style="display: none;">
+            <engine:VisualElement class="modal-box">
+                <engine:Label text="Settings" class="heading-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84); font-size: 50px;"/>
+                <engine:Label text="Master Volume" style="font-size: 50px; -unity-font-style: bold; margin-bottom: 10px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84);"/>
+                <engine:Slider name="audioSlider" low-value="0" high-value="1" style="width: 300px; margin-bottom: 30px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px;"/>
+                <engine:Button name="closeSettingsButton" text="Close" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; color: rgb(7, 33, 84);"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="gameHUDPanel" class="transparent-panel" style="display: none; align-items: flex-start; justify-content: flex-start; pointer-events: none;">
+            <engine:VisualElement class="hud-container">
+                <engine:Label name="timerText" text="Time: 60s" class="timer-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 45px; color: rgb(7, 33, 84);"/>
+                <engine:VisualElement name="targetContainer" class="target-list" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px;"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="gameWinPanel" class="transparent-panel" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+            <engine:VisualElement class="modal-box">
+                <engine:Label text="Level Complete!" class="heading-text" style="color: rgb(76, 175, 80);"/>
+                <engine:Button name="nextLevelButton" text="Next Level" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 40px; color: rgb(7, 33, 84);"/>
+                <engine:Button name="winMenuButton" text="Main Menu" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; color: rgb(7, 33, 84);"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+        <engine:VisualElement name="gameOverPanel" class="transparent-panel" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
+            <engine:VisualElement class="modal-box">
+                <engine:Label text="Out of Time!" class="heading-text" style="color: rgb(244, 67, 54);"/>
+                <engine:Button name="retryButton" text="Retry" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 40px; color: rgb(7, 33, 84);"/>
+                <engine:Button name="loseMenuButton" text="Main Menu" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 45px; color: rgb(7, 33, 84);"/>
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

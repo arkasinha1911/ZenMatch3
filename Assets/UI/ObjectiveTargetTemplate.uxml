@@ -1,0 +1,7 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles.uss?fileID=7433441132597879392&amp;guid=f260423968c92614cb85e6a4e86b10ed&amp;type=3#Styles"/>
+    <engine:VisualElement class="objective-container" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 20px;">
+        <engine:VisualElement name="targetIcon" class="objective-icon"/>
+        <engine:Label name="targetProgressText" text="0 / 10" class="objective-text" style="color: rgb(13, 39, 65); font-size: 30px;"/>
+    </engine:VisualElement>
+</engine:UXML>

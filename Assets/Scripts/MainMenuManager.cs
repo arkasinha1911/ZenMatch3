@@ -1,133 +1,112 @@
 using UnityEngine;
-using UnityEngine.UI; // Allows us to control Buttons via code
+using UnityEngine.UIElements; // UI Toolkit Support
 
 /// <summary>
-/// This script manages the Main Menu experience before the gameplay actually starts.
-/// It acts like a giant set of light switches, turning the Game UI ON and the Menu UI OFF, or vice versa!
-/// It connects to the GridSpawner and LevelManager to physically disable them while the player is just looking at the menus.
+/// This script manages the Main Menu experience before the gameplay actually starts using UI Toolkit.
 /// </summary>
 public class MainMenuManager : MonoBehaviour
 {
-    [Header("UI Panels")]
-    [Tooltip("The main menu screen containing the giant Play button and title.")]
-    public GameObject mainMenuPanel;
-
-    [Tooltip("Drag the actual Play Button GameObject here to automatically hook it up via code!")]
-    public Button playButton;
-
-    [Tooltip("The panel containing your LevelSelectUI script and the grid of unlocked level buttons.")]
-    public GameObject levelSelectPanel;
-
-    [Tooltip("The standalone ScrollView object. Link this here to guarantee it turns on/off correctly!")]
-    public GameObject levelScrollView;
-
-    [Tooltip("The panel containing your Settings and Audio slider controls.")]
-    public GameObject settingsPanel;
-
-    [Tooltip("A panel containing your in-game Score, Timer, and Target UI. We hide this during the menus so it doesn't overlap!")]
-    public GameObject gameHUDPanel;
-
-    [Header("Gameplay Connections")]
-    // We need direct connections to the actual game logic scripts so we can freeze them if a menu is open.
-    [Tooltip("Drag your GridSpawner here so we can turn the board generation ON/OFF. Ensures pieces don't fall behind the menu!")]
-    public GridSpawner gridSpawner;
+    [Header("UI Toolkit")]
+    public UIDocument uiDocument;
     
-    [Tooltip("Drag your LevelManager here so we can freeze the countdown timer while in the menu.")]
+    [Header("Gameplay Connections")]
+    public GridSpawner gridSpawner;
     public LevelManager levelManager;
+    public LevelSelectUI levelSelectUI; // Reference to refresh the level buttons when the panel opens!
 
-    /// <summary>
-    /// Start runs when the Menu Scene is loaded. We use it to decide what screen to show first.
-    /// </summary>
+    private VisualElement mainMenuPanel;
+    private VisualElement levelSelectPanel;
+    private VisualElement settingsPanel;
+    private VisualElement gameHUDPanel;
+
     private void Start()
     {
-        // 0. Automatically wire up the Play button click event via code!
-        if (playButton != null)
+        if (uiDocument == null) return;
+        var root = uiDocument.rootVisualElement;
+
+        // Core Panels
+        mainMenuPanel = root.Q<VisualElement>("mainMenuPanel");
+        levelSelectPanel = root.Q<VisualElement>("levelSelectPanel");
+        settingsPanel = root.Q<VisualElement>("settingsPanel");
+        gameHUDPanel = root.Q<VisualElement>("gameHUDPanel");
+
+        // Buttons
+        Button playButton = root.Q<Button>("playButton");
+        Button settingsOpenButton = root.Q<Button>("settingsOpenButton");
+        Button backToMenuButton = root.Q<Button>("backToMenuButton");
+        Button closeSettingsButton = root.Q<Button>("closeSettingsButton");
+        Button exitButton = root.Q<Button>("exitButton");
+
+        // Button Listeners
+        if (playButton != null) playButton.clicked += ShowLevelSelect;
+        if (settingsOpenButton != null) settingsOpenButton.clicked += ShowSettings;
+        if (backToMenuButton != null) backToMenuButton.clicked += ShowMainMenu;
+        if (closeSettingsButton != null) closeSettingsButton.clicked += ShowMainMenu;
+        
+        if (exitButton != null)
         {
-            // This code tells the button: "When you are clicked, run ShowLevelSelect()"
-            playButton.onClick.AddListener(ShowLevelSelect);
+            exitButton.clicked += () => 
+            {
+                Debug.Log("Exiting Game...");
+                Application.Quit();
+            };
         }
 
-        // 1. Check with the ProgressionManager (our permanent memory module).
-        // If 'returnToMenu' is FALSE, it means the player clicked "Restart Level" or "Next Level" and we should bypass the menu entirely!
+        // Determine which screen to show on boot based on whether we "Restarted" a level
         if (ProgressionManager.Instance != null && !ProgressionManager.Instance.returnToMenu)
         {
             HideAllMenus(); // Starts the game immediately!
         }
         else
         {
-            // 2. Otherwise, this is a fresh launch or they intentionally clicked "Back to Menu".
             ShowMainMenu();
         }
     }
 
-    /// <summary>
-    /// This method hides all UI menus and actively turns the game ON. 
-    /// It is called automatically by Start() if returnToMenu is false, or by a "Resume/Play" button.
-    /// </summary>
     public void HideAllMenus()
     {
-        // Safely turn off all menu screens (if they are assigned in the Inspector)
-        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
-        if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
-        if (levelScrollView != null) levelScrollView.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.style.display = DisplayStyle.None;
+        if (levelSelectPanel != null) levelSelectPanel.style.display = DisplayStyle.None;
+        if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.None;
 
-        // Turn gameplay ON! 
-        // Activating these scripts means Update() and Start() will finally run inside them.
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(true);
         if (levelManager != null) levelManager.gameObject.SetActive(true);
-        if (gameHUDPanel != null) gameHUDPanel.SetActive(true);
+        if (gameHUDPanel != null) gameHUDPanel.style.display = DisplayStyle.Flex; // Show HUD overlay
     }
 
-    /// <summary>
-    /// Attach this method to your "Back" button or call it to return to the very first title screen.
-    /// </summary>
     public void ShowMainMenu()
     {
-        // Turn ON just the Main Menu panel, turn OFF everything else.
-        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
-        if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
-        if (levelScrollView != null) levelScrollView.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.style.display = DisplayStyle.Flex;
+        if (levelSelectPanel != null) levelSelectPanel.style.display = DisplayStyle.None;
+        if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.None;
 
-        // Turn gameplay OFF! 
-        // Disabling these GameObjects completely pauses all matching and grid spawning logic.
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
         if (levelManager != null) levelManager.gameObject.SetActive(false);
-        if (gameHUDPanel != null) gameHUDPanel.SetActive(false);
+        if (gameHUDPanel != null) gameHUDPanel.style.display = DisplayStyle.None;
     }
 
-    /// <summary>
-    /// Attach this to your main "Play" button! It opens the big grid of Level Buttons.
-    /// </summary>
     public void ShowLevelSelect()
     {
-        // Hide the title screen, show the level select screen.
-        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
-        if (levelSelectPanel != null) levelSelectPanel.SetActive(true);
-        if (levelScrollView != null) levelScrollView.SetActive(true);
-        if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.style.display = DisplayStyle.None;
+        if (levelSelectPanel != null) levelSelectPanel.style.display = DisplayStyle.Flex;
+        if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.None;
 
-        // Keep gameplay OFF so timers don't tick down while they pick a level.
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
         if (levelManager != null) levelManager.gameObject.SetActive(false);
-        if (gameHUDPanel != null) gameHUDPanel.SetActive(false);
+        if (gameHUDPanel != null) gameHUDPanel.style.display = DisplayStyle.None;
+        
+        // Dynamically tell the other script to generate the UI Buttons now that the screen is visible!
+        if (levelSelectUI != null) levelSelectUI.GenerateLevelButtons();
     }
 
-    /// <summary>
-    /// Attach this to your "Settings/Gear" button! It opens the Audio controls.
-    /// </summary>
     public void ShowSettings()
     {
-        // Hide the title screen, show the settings screen.
-        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
-        if (levelSelectPanel != null) levelSelectPanel.SetActive(false);
-        if (levelScrollView != null) levelScrollView.SetActive(false);
-        if (settingsPanel != null) settingsPanel.SetActive(true);
+        if (mainMenuPanel != null) mainMenuPanel.style.display = DisplayStyle.None;
+        if (levelSelectPanel != null) levelSelectPanel.style.display = DisplayStyle.None;
+        if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.Flex;
 
-        // Keep gameplay OFF.
         if (gridSpawner != null) gridSpawner.gameObject.SetActive(false);
         if (levelManager != null) levelManager.gameObject.SetActive(false);
-        if (gameHUDPanel != null) gameHUDPanel.SetActive(false);
+        if (gameHUDPanel != null) gameHUDPanel.style.display = DisplayStyle.None;
     }
 }

@@ -1,0 +1,7 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles.uss?fileID=7433441132597879392&amp;guid=f260423968c92614cb85e6a4e86b10ed&amp;type=3#Styles"/>
+    <engine:Button name="RootLevelButton" class="standard-button level-button" style="height: 118px; width: 335px; top: auto; flex-direction: column; align-self: center; -unity-text-align: middle-center;">
+        <engine:Label name="levelText" text="Level 1" class="level-button-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
+        <engine:Label name="scoreText" text="High Score: 0" class="level-button-score" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84); font-size: 25px;"/>
+    </engine:Button>
+</engine:UXML>

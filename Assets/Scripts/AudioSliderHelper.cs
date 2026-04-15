@@ -1,33 +1,38 @@
 using UnityEngine;
-using UnityEngine.UI; // Required for interacting with the Slider component
+using UnityEngine.UIElements; // UI Toolkit Support
 
 /// <summary>
-/// This tiny helper script is designed to sit directly on the physical Audio "Volume Slider" UI.
-/// When the menu opens it ensures the visual drag-handle actually aligns with the player's saved volume.
+/// This tiny helper script is designed to sit alongside a UIDocument.
+/// It queries the actual Volume Slider out of the layout and binds it to PlayerPrefs!
 /// </summary>
-[RequireComponent(typeof(Slider))]
+[RequireComponent(typeof(UIDocument))]
 public class AudioSliderHelper : MonoBehaviour
 {
-    // The physical slider component managing the audio.
     private Slider volumeSlider;
 
-    /// <summary>
-    /// Start runs when the slider appears on the screen.
-    /// </summary>
     private void Start()
     {
-        // Finds the exact slider connected to this object.
-        volumeSlider = GetComponent<Slider>();
+        var doc = GetComponent<UIDocument>();
+        if (doc == null || doc.rootVisualElement == null) return;
         
-        // Ensure the slider visual handle instantly snaps to match the actual saved volume on launch
+        volumeSlider = doc.rootVisualElement.Q<Slider>("audioSlider");
+
         if (volumeSlider != null)
         {
-            // Grab the saved volume out of the computer's hard drive using PlayerPrefs.
-            // If they haven't played before, default the handle to 1.0 (Full max volume!).
             float savedVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
-            
-            // Overwrite the visual slider position with the real number!
             volumeSlider.value = savedVolume;
+
+            // Bind the listener dynamically
+            volumeSlider.RegisterValueChangedCallback(evt =>
+            {
+                PlayerPrefs.SetFloat("MasterVolume", evt.newValue);
+                PlayerPrefs.Save();
+                
+                if (AudioManager.Instance != null)
+                {
+                    AudioManager.Instance.SetVolume(evt.newValue);
+                }
+            });
         }
     }
 }
