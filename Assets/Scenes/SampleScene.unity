@@ -690,18 +690,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridSpawner
   columns: 8
-  rows: 6
-  spacingX: 0.74
-  spacingY: 0.74
+  rows: 10
+  spacingX: 0.62
+  spacingY: 0.53
   centerGrid: 1
   spawnOnStart: 1
   usePerlinNoise: 1
   noiseScale: 0.5
   noiseThreshold: 0.195
   centerBlankBias: 0.141
-  blankAreaPrefab: {fileID: 974094729991280316, guid: 8916fa9794cb2ce45a9fb2f91ea2f459, type: 3}
+  blankAreaPrefab: {fileID: 4654262940945227369, guid: bb3b3ff945ae21647876bdac0604b556, type: 3}
   prefabsToSpawn:
-  - {fileID: 756318449612987101, guid: bde66f424fa703349a327ec196e2aef8, type: 3}
+  - {fileID: 4196628145204597246, guid: 27553447e4bcafb48a1131b45fc8916d, type: 3}
   - {fileID: 8514071769038930306, guid: b4d3eb498f6a85748a17b71b70047f2d, type: 3}
   - {fileID: 5497656661298373841, guid: 0d8509461bed2a24cb869e9b6aece9fa, type: 3}
   - {fileID: 1231800044163189978, guid: 9a594609e33188047a0578d6829c4ccc, type: 3}

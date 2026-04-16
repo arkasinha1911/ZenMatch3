@@ -14,7 +14,7 @@ Material:
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
+  m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -29,13 +29,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BevelStrength: 0.957
-    - _EnableSweep: 1
-    - _Shininess: 30.6
+    - _BevelStrength: 0.93
+    - _EnableSweep: 0.04
+    - _Shininess: 11.7
     - _SweepSpeed: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _HighLightColor: {r: 1, g: 1, b: 1, a: 0.46666667}
-    - _LightDirection: {r: -0.86, g: 0.86, b: 1, a: 0}
+    - _LightDirection: {r: -6.31, g: 7.85, b: -0.74, a: -1.53}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

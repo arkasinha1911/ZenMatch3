@@ -43,7 +43,7 @@ public class InputController : MonoBehaviour
         if (gridSpawner == null) return;
 
         // If the game is paused or over, DO NOT let them click anything!
-        if (LevelManager.Instance != null && !LevelManager.Instance.IsGameActive) return;
+        if (LevelManager.Instance != null && (!LevelManager.Instance.IsGameActive || LevelManager.Instance.IsPaused)) return;
 
         // If the board is currently exploding or dropping pieces, lock the controls so they don't break the game!
         if (gridSpawner.isProcessing) return;

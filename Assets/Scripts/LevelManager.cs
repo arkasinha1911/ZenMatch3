@@ -30,9 +30,12 @@ public class LevelManager : MonoBehaviour
 
     private VisualElement gameWinPanel;
     private VisualElement gameOverPanel;
+    private VisualElement gamePausePanel;
     private Label timerText;
+    private Label scoreText;
 
     public bool IsGameActive { get; private set; } = true;
+    public bool IsPaused { get; private set; } = false;
 
     [HideInInspector]
     public static List<int> forcedTargetPieceTypes = null;
@@ -48,10 +51,26 @@ public class LevelManager : MonoBehaviour
         if (ProgressionManager.Instance != null)
         {
             int level = ProgressionManager.Instance.currentPlayingLevel;
-            countdownTimer = Mathf.Max(30f, 60f - (level * 1.5f));
-            foreach (var target in targets)
+            
+            bool isChallengeLevel = (level % 10 == 0);
+            
+            if (isChallengeLevel)
             {
-                target.amountRequired = 10 + (level * 3);
+                // Challenge levels are much stricter on time and require more shapes!
+                countdownTimer = Mathf.Max(20f, 45f - (level * 2.0f)); 
+                foreach (var target in targets)
+                {
+                    target.amountRequired = 20 + (level * 5);
+                }
+            }
+            else
+            {
+                // Standard progression
+                countdownTimer = Mathf.Max(30f, 60f - (level * 1.5f));
+                foreach (var target in targets)
+                {
+                    target.amountRequired = 10 + (level * 3);
+                }
             }
         }
 
@@ -65,24 +84,39 @@ public class LevelManager : MonoBehaviour
 
             gameWinPanel = root.Q<VisualElement>("gameWinPanel");
             gameOverPanel = root.Q<VisualElement>("gameOverPanel");
+            gamePausePanel = root.Q<VisualElement>("gamePausePanel");
             timerText = root.Q<Label>("timerText");
+            scoreText = root.Q<Label>("scoreText");
             
             // Wire buttons if present
             Button nextLevelButton = root.Q<Button>("nextLevelButton");
             Button winMenuButton = root.Q<Button>("winMenuButton");
             Button retryButton = root.Q<Button>("retryButton");
             Button loseMenuButton = root.Q<Button>("loseMenuButton");
+            
+            // HUD and Pause Buttons
+            Button hudBackButton = root.Q<Button>("hudBackButton");
+            Button hudPauseButton = root.Q<Button>("hudPauseButton");
+            Button resumeButton = root.Q<Button>("resumeButton");
+            Button pauseMenuButton = root.Q<Button>("pauseMenuButton");
 
             if (nextLevelButton != null) nextLevelButton.clicked += LoadNextLevel;
             if (retryButton != null) retryButton.clicked += RetryLevel;
 
-            // Optional: return to main menu buttons
+            // Return to main menu buttons
             if (winMenuButton != null) winMenuButton.clicked += ReturnToMenu;
             if (loseMenuButton != null) loseMenuButton.clicked += ReturnToMenu;
+            if (hudBackButton != null) hudBackButton.clicked += ReturnToMenu;
+            if (pauseMenuButton != null) pauseMenuButton.clicked += ReturnToMenu;
+
+            // Pause mechanics
+            if (hudPauseButton != null) hudPauseButton.clicked += PauseGame;
+            if (resumeButton != null) resumeButton.clicked += ResumeGame;
 
             // Hide Modals initially
             if (gameWinPanel != null) gameWinPanel.style.display = DisplayStyle.None;
             if (gameOverPanel != null) gameOverPanel.style.display = DisplayStyle.None;
+            if (gamePausePanel != null) gamePausePanel.style.display = DisplayStyle.None;
 
             // Generative UI for Objectives
             VisualElement targetContainer = root.Q<VisualElement>("targetContainer");
@@ -165,7 +199,7 @@ public class LevelManager : MonoBehaviour
 
     private void Update()
     {
-        if (!IsGameActive) return;
+        if (!IsGameActive || IsPaused) return;
 
         countdownTimer -= Time.deltaTime;
         if (countdownTimer <= 0f)
@@ -177,6 +211,11 @@ public class LevelManager : MonoBehaviour
         if (timerText != null)
         {
             timerText.text = $"Time: {Mathf.CeilToInt(countdownTimer)}s";
+        }
+
+        if (scoreText != null && ScoreManager.Instance != null)
+        {
+            scoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
         }
     }
 
@@ -222,6 +261,7 @@ public class LevelManager : MonoBehaviour
     private void TriggerGameWin()
     {
         IsGameActive = false;
+        IsPaused = false;
         if (gameWinPanel != null) gameWinPanel.style.display = DisplayStyle.Flex;
         Time.timeScale = 0f; 
         
@@ -241,6 +281,7 @@ public class LevelManager : MonoBehaviour
     private void TriggerGameOver()
     {
         IsGameActive = false;
+        IsPaused = false;
         if (gameOverPanel != null) gameOverPanel.style.display = DisplayStyle.Flex;
         Time.timeScale = 0f; 
     }
@@ -265,10 +306,27 @@ public class LevelManager : MonoBehaviour
 
     private void ReturnToMenu()
     {
+        IsPaused = false;
         if (ProgressionManager.Instance != null)
             ProgressionManager.Instance.returnToMenu = true;
             
         Time.timeScale = 1f;
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+    }
+    
+    public void PauseGame()
+    {
+        if (!IsGameActive) return;
+        IsPaused = true;
+        Time.timeScale = 0f;
+        if (gamePausePanel != null) gamePausePanel.style.display = DisplayStyle.Flex;
+    }
+
+    public void ResumeGame()
+    {
+        if (!IsGameActive) return;
+        IsPaused = false;
+        Time.timeScale = 1f;
+        if (gamePausePanel != null) gamePausePanel.style.display = DisplayStyle.None;
     }
 }

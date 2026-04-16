@@ -100,11 +100,49 @@ public class GridSpawner : MonoBehaviour
     // If the player clicks "Retry Level" we use this memorized seed to force the game to generate the EXACT same layout.
     public static Vector2? forcedNoiseOffset = null;
 
+    // Tracks the physical scale-down mathematical ratio
+    private float gridScaleMultiplier = 1f;
+
     void Start()
     {
+        // 1. Dynamic Grid Scaling based on Difficulty
+        if (ProgressionManager.Instance != null)
+        {
+            int level = ProgressionManager.Instance.currentPlayingLevel;
+            
+            // Scale grid size every 10 levels. e.g. Levels 1-9 = 5x5, 10-19 = 6x6. Capped at 9x9.
+            columns = Mathf.Clamp(5 + (level / 10), 5, 9);
+            rows = Mathf.Clamp(5 + (level / 10), 5, 9);
+        }
+
+        // Squeeze multiplier: Force massive boards to shrink their pieces so it physically fits inside the same space a 5x5 board takes up!
+        int largestAxis = Mathf.Max(columns, rows);
+        gridScaleMultiplier = 5f / (float)largestAxis;
+
+        // 2. Adjust Camera so it's always fully visible regardless of how large the board became
+        AdjustCameraToFitGrid();
+
         if (spawnOnStart)
         {
             SpawnGrid();
+        }
+    }
+
+    private void AdjustCameraToFitGrid()
+    {
+        if (Camera.main != null)
+        {
+            float scaledSpacingY = spacingY * gridScaleMultiplier;
+            float scaledSpacingX = spacingX * gridScaleMultiplier;
+            
+            // Calculate necessary orthographic size for height (leaving a 2 unit padding border)
+            float heightNeeded = (rows * scaledSpacingY) / 2f + 2f; 
+            
+            // Calculate necessary orthographic size for width (Camera width = orthoSize * aspect * 2)
+            float widthNeeded = ((columns * scaledSpacingX) / 2f + 2f) / Camera.main.aspect;
+
+            // Pick the larger of the two to ensure both width and height perfectly fit
+            Camera.main.orthographicSize = Mathf.Max(5f, Mathf.Max(heightNeeded, widthNeeded));
         }
     }
 
@@ -193,6 +231,9 @@ public class GridSpawner : MonoBehaviour
                         GameObject blankObject = Instantiate(blankAreaPrefab, position, Quaternion.identity);
                         blankObject.transform.SetParent(this.transform);
                         blankObject.name = $"Blank_{x}_{y}";
+                        
+                        // Shrink background decorations as well so they don't visually overlap the squeezed board!
+                        blankObject.transform.localScale = blankObject.transform.localScale * gridScaleMultiplier;
                     }
                 }
             }
@@ -205,6 +246,15 @@ public class GridSpawner : MonoBehaviour
         {
             isProcessing = true;
             StartCoroutine(ResolveMatchesCoroutine(initialMatches));
+        }
+        else
+        {
+            // Edge case: what if we just randomly generated a board with ZERO valid moves to start with?
+            if (!HasPossibleMoves())
+            {
+                Debug.Log("SpawnGrid created a dead board... Reshuffling immediately!");
+                StartCoroutine(ReshuffleBoardCoroutine());
+            }
         }
     }
 
@@ -226,6 +276,9 @@ public class GridSpawner : MonoBehaviour
             // 3. Physically create the clone.
             GameObject spawnedObject = Instantiate(selectedPrefab, position, Quaternion.identity);
             spawnedObject.transform.SetParent(this.transform);
+            
+            // Physically shrink the mesh to prevent visual overlapping on larger grids, while respecting the user's custom prefab scale!
+            spawnedObject.transform.localScale = spawnedObject.transform.localScale * gridScaleMultiplier;
 
             // 4. Attach or locate our GridPiece memory script
             GridPiece piece = spawnedObject.GetComponent<GridPiece>();
@@ -258,6 +311,9 @@ public class GridSpawner : MonoBehaviour
         Vector3 position = GetWorldPosition(x, y);
         GameObject spawnedObject = Instantiate(specialPrefab, position, Quaternion.identity);
         spawnedObject.transform.SetParent(this.transform);
+        
+        // Shrink bombs to fit the board properly too, respecting their base prefab scale!
+        spawnedObject.transform.localScale = spawnedObject.transform.localScale * gridScaleMultiplier;
 
         GridPiece piece = spawnedObject.GetComponent<GridPiece>();
         if (piece == null)
@@ -292,15 +348,18 @@ public class GridSpawner : MonoBehaviour
     {
         Vector3 startPosition = transform.position;
         
+        float scaledSpacingX = spacingX * gridScaleMultiplier;
+        float scaledSpacingY = spacingY * gridScaleMultiplier;
+        
         // Offset math used to ensure the board sits exactly in the center of the camera.
         if (centerGrid)
         {
-            float totalWidth = (columns - 1) * spacingX;
-            float totalHeight = (rows - 1) * spacingY;
+            float totalWidth = (columns - 1) * scaledSpacingX;
+            float totalHeight = (rows - 1) * scaledSpacingY;
             startPosition -= new Vector3(totalWidth / 2f, totalHeight / 2f, 0f);
         }
         
-        return startPosition + new Vector3(x * spacingX, y * spacingY, 0f);
+        return startPosition + new Vector3(x * scaledSpacingX, y * scaledSpacingY, 0f);
     }
 
     /// <summary>
@@ -691,8 +750,19 @@ public class GridSpawner : MonoBehaviour
             // NOTE: Since we are in a 'while' loop, if currentMatches.Count > 0, the ENTIRE demolition logic repeats!
         }
 
-        // Loop finished. No more matches found. The board settles, and we unlock the controls!
-        isProcessing = false;
+        // Loop finished. No more matches found. The board settles.
+        
+        // Final sanity check: Are there actually any legal moves left for the player to make?
+        if (!HasPossibleMoves())
+        {
+            Debug.Log("No valid moves remain! Reshuffling the board...");
+            StartCoroutine(ReshuffleBoardCoroutine());
+        }
+        else
+        {
+            // Unlock the controls!
+            isProcessing = false;
+        }
     }
 
     /// <summary>
@@ -745,7 +815,8 @@ public class GridSpawner : MonoBehaviour
                         Vector3 dropPos = GetWorldPosition(x, y);
                         
                         // Spawn them (rows * spacingY) units artificially higher into the unseen camera void!
-                        Vector3 offscreenPos = dropPos + new Vector3(0, rows * spacingY, 0); 
+                        float scaledSpacingY = spacingY * gridScaleMultiplier;
+                        Vector3 offscreenPos = dropPos + new Vector3(0, rows * scaledSpacingY, 0); 
                         
                         GridPiece newPiece = SpawnRandomPrefab(x, y, offscreenPos);
                         
@@ -922,5 +993,93 @@ public class GridSpawner : MonoBehaviour
             #endif
         }
         grid = null;
+    }
+
+    /// <summary>
+    /// Checks the entire board to see if there is at least one legal Match-3 move remaining.
+    /// </summary>
+    public bool HasPossibleMoves()
+    {
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                GridPiece p1 = grid[x, y];
+                if (p1 == null) continue;
+
+                // Bombs can always be swiped to detonate instantly! This counts as a valid move!
+                if (p1.powerUp != PowerUpType.None) return true;
+
+                // Try swiping right
+                if (x + 1 < columns)
+                {
+                    GridPiece p2 = grid[x + 1, y];
+                    if (p2 != null && p2.powerUp == PowerUpType.None)
+                    {
+                        if (SimulateSwapAndCheck(p1, p2)) return true;
+                    }
+                }
+
+                // Try swiping up
+                if (y + 1 < rows)
+                {
+                    GridPiece p2 = grid[x, y + 1];
+                    if (p2 != null && p2.powerUp == PowerUpType.None)
+                    {
+                        if (SimulateSwapAndCheck(p1, p2)) return true;
+                    }
+                }
+            }
+        }
+
+        // We scanned the whole board and found 0 moves. The player is softlocked!
+        return false;
+    }
+
+    /// <summary>
+    /// Temporarily swaps the memory of two pieces and checks if it mathematically triggers a match.
+    /// </summary>
+    private bool SimulateSwapAndCheck(GridPiece p1, GridPiece p2)
+    {
+        if (p1 == null || p2 == null) return false;
+        if (p1.pieceType == -1 || p2.pieceType == -1) return false; 
+
+        // 1. Temporarily swap their internal color types
+        int tempType = p1.pieceType;
+        p1.pieceType = p2.pieceType;
+        p2.pieceType = tempType;
+
+        // 2. Scan the board! Did our fake swap cause a Match-3?
+        bool hasMatch = GetMatches().Count > 0;
+
+        // 3. Revert their colors back to normal before anyone notices!
+        p2.pieceType = p1.pieceType; 
+        p1.pieceType = tempType;
+
+        return hasMatch;
+    }
+
+    /// <summary>
+    /// Flushes the entire board and drops in fresh pieces when the player runs out of moves.
+    /// </summary>
+    private IEnumerator ReshuffleBoardCoroutine()
+    {
+        // Lock the board (already locked from ResolveMatches, but safe to explicitly state)
+        isProcessing = true;
+        
+        // Give the player a tiny window to realize nothing matchable exists
+        yield return new WaitForSeconds(0.5f);
+
+        // Nuke all the physical objects
+        ClearGrid();
+        
+        // A visual pause before dropping in fresh ones
+        yield return new WaitForSeconds(0.5f);
+
+        // Unlock the board before resolving, SpawnGrid handles relocking if there are accidental matches!
+        isProcessing = false;
+        
+        // Respawn the entire board from scratch!
+        SpawnGrid();
     }
 }
