@@ -61,6 +61,11 @@ public class GridSpawner : MonoBehaviour
     [Tooltip("An optional physical object to spawn over holes (like a dark pit graphic or water texture).")]
     public GameObject blankAreaPrefab;
 
+    [Header("Board Aesthetics")]
+    public bool drawGridBackgrounds = true;
+    public Color gridBackgroundColor = new Color(0.1f, 0.2f, 0.4f, 0.5f); // Translucent deep blue
+    private Sprite proceduralTileSprite;
+
     [Header("Spawn Objects")]
     [Tooltip("The actual playable shapes! The game will randomly pick one from this list every time it needs a new piece.")]
     public List<GameObject> prefabsToSpawn;
@@ -122,10 +127,26 @@ public class GridSpawner : MonoBehaviour
         // 2. Adjust Camera so it's always fully visible regardless of how large the board became
         AdjustCameraToFitGrid();
 
+        if (drawGridBackgrounds)
+        {
+            GenerateProceduralTile();
+        }
+
         if (spawnOnStart)
         {
             SpawnGrid();
         }
+    }
+
+    private void GenerateProceduralTile()
+    {
+        Texture2D tex = new Texture2D(32, 32);
+        Color[] pixels = new Color[32 * 32];
+        for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
+        tex.SetPixels(pixels);
+        tex.Apply();
+        
+        proceduralTileSprite = Sprite.Create(tex, new Rect(0, 0, 32, 32), new Vector2(0.5f, 0.5f), 32f);
     }
 
     private void AdjustCameraToFitGrid()
@@ -135,14 +156,13 @@ public class GridSpawner : MonoBehaviour
             float scaledSpacingY = spacingY * gridScaleMultiplier;
             float scaledSpacingX = spacingX * gridScaleMultiplier;
             
-            // Calculate necessary orthographic size for height (leaving a 2 unit padding border)
-            float heightNeeded = (rows * scaledSpacingY) / 2f + 2f; 
+            // Calculate necessary orthographic size for height (leaving a tiny padding border instead of a massive one so pieces look visually much larger)
+            float heightNeeded = (rows * scaledSpacingY) / 2f + 0.5f; 
             
-            // Calculate necessary orthographic size for width (Camera width = orthoSize * aspect * 2)
-            float widthNeeded = ((columns * scaledSpacingX) / 2f + 2f) / Camera.main.aspect;
+            float widthNeeded = ((columns * scaledSpacingX) / 2f + 0.5f) / Camera.main.aspect;
 
             // Pick the larger of the two to ensure both width and height perfectly fit
-            Camera.main.orthographicSize = Mathf.Max(5f, Mathf.Max(heightNeeded, widthNeeded));
+            Camera.main.orthographicSize = Mathf.Max(3f, Mathf.Max(heightNeeded, widthNeeded));
         }
     }
 
@@ -216,7 +236,13 @@ public class GridSpawner : MonoBehaviour
 
                 if (isPlayable)
                 {
-                    // It's solid ground! Spawn a random physics piece here.
+                    // It's solid ground! 
+                    if (drawGridBackgrounds && proceduralTileSprite != null)
+                    {
+                        SpawnBackgroundTile(x, y);
+                    }
+                    
+                    // Spawn a random physics piece here.
                     SpawnRandomPrefab(x, y);
                 }
                 else
@@ -258,6 +284,22 @@ public class GridSpawner : MonoBehaviour
         }
     }
 
+    private void SpawnBackgroundTile(int x, int y)
+    {
+        GameObject bgObj = new GameObject($"BgTile_{x}_{y}");
+        bgObj.transform.position = GetWorldPosition(x, y);
+        bgObj.transform.SetParent(this.transform);
+
+        SpriteRenderer sr = bgObj.AddComponent<SpriteRenderer>();
+        sr.sprite = proceduralTileSprite;
+        sr.color = gridBackgroundColor;
+        sr.sortingOrder = -10; // Render strictly behind physical pieces
+
+        // Scale it visually to match the board spacing. The baseline multiplier is raised to make the squares look massive!
+        float scaleFactor = 1.05f * gridScaleMultiplier;
+        bgObj.transform.localScale = new Vector3(spacingX * scaleFactor, spacingY * scaleFactor, 1f);
+    }
+
     /// <summary>
     /// Spawns a standard game piece (Square, Circle, Star, etc) at a specific coordinate.
     /// </summary>
@@ -277,8 +319,8 @@ public class GridSpawner : MonoBehaviour
             GameObject spawnedObject = Instantiate(selectedPrefab, position, Quaternion.identity);
             spawnedObject.transform.SetParent(this.transform);
             
-            // Physically shrink the mesh to prevent visual overlapping on larger grids, while respecting the user's custom prefab scale!
-            spawnedObject.transform.localScale = spawnedObject.transform.localScale * gridScaleMultiplier;
+            // Physically boost the mesh size by 1.2x so the graphic fills the square grid nicely, without overlapping into neighbor bounds!
+            spawnedObject.transform.localScale = spawnedObject.transform.localScale * gridScaleMultiplier * 1.2f;
 
             // 4. Attach or locate our GridPiece memory script
             GridPiece piece = spawnedObject.GetComponent<GridPiece>();
@@ -312,8 +354,8 @@ public class GridSpawner : MonoBehaviour
         GameObject spawnedObject = Instantiate(specialPrefab, position, Quaternion.identity);
         spawnedObject.transform.SetParent(this.transform);
         
-        // Shrink bombs to fit the board properly too, respecting their base prefab scale!
-        spawnedObject.transform.localScale = spawnedObject.transform.localScale * gridScaleMultiplier;
+        // Match the boosted visual size ratio applied to standard pieces (1.2x multiplier).
+        spawnedObject.transform.localScale = spawnedObject.transform.localScale * gridScaleMultiplier * 1.2f;
 
         GridPiece piece = spawnedObject.GetComponent<GridPiece>();
         if (piece == null)

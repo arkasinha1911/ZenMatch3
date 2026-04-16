@@ -53,32 +53,64 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        if (gridSpawner == null) gridSpawner = FindObjectOfType<GridSpawner>();
+
         if (ProgressionManager.Instance != null)
         {
             int level = ProgressionManager.Instance.currentPlayingLevel;
             
+            // DYNAMIC TARGET COUNT SCALING
+            // The number of distinct shapes to collect scales with level 
+            int numTargetsToSpawn = 1;
+            if (level >= 31 && level <= 50) numTargetsToSpawn = 2;
+            else if (level >= 51 && level <= 70) numTargetsToSpawn = 3;
+            else if (level >= 71 && level <= 100) numTargetsToSpawn = 4;
+            else if (level > 100) numTargetsToSpawn = 5;
+            if (gridSpawner != null && gridSpawner.prefabsToSpawn != null)
+            {
+                numTargetsToSpawn = Mathf.Min(numTargetsToSpawn, gridSpawner.prefabsToSpawn.Count);
+            }
+            // Need to recreate the list fully
+            targets = new List<LevelTarget>();
+            for(int i = 0; i < numTargetsToSpawn; i++)
+            {
+                targets.Add(new LevelTarget());
+            }
+
             bool isChallengeLevel = (level % 10 == 0);
             
             if (isChallengeLevel)
             {
-                // Challenge levels are much stricter on time and require more shapes!
-                // countdownTimer = Mathf.Max(20f, 45f - (level * 2.0f)); 
-                maxMoves = Mathf.Max(15, 30 - (level / 2));
+                // Challenge levels are stricter on moves! Minimum of 15.
+                maxMoves = Mathf.Max(15, 25 - (level / 15));
                 
                 foreach (var target in targets)
                 {
-                    target.amountRequired = 20 + (level * 5);
+                    // Get base expected total blocks to clear, then verify it's mathematically possible!
+                    int totalExpected = 20 + (level * 2);
+                    
+                    // A very good player clears ~3.5 target blocks per move via cascades/bombs.
+                    // We hard-cap the required blocks so it never asks for more than is physically possible.
+                    totalExpected = Mathf.Min(totalExpected, (int)(maxMoves * 3.5f));
+                    
+                    target.amountRequired = Mathf.Max(10, totalExpected / numTargetsToSpawn);
                 }
             }
             else
             {
-                // Standard progression
-                // countdownTimer = Mathf.Max(30f, 60f - (level * 1.5f));
-                maxMoves = Mathf.Max(20, 40 - (level / 3));
+                // Standard progression: Minimum of 25 moves
+                maxMoves = Mathf.Max(25, 35 - (level / 10));
                 
                 foreach (var target in targets)
                 {
-                    target.amountRequired = 10 + (level * 3);
+                    // Slow steady scaling
+                    int totalExpected = 15 + level;
+                    
+                    // A standard player clears ~2.5 blocks of their target per move.
+                    // Hard cap to prevent impossible requirements at high levels!
+                    totalExpected = Mathf.Min(totalExpected, (int)(maxMoves * 2.5f));
+                    
+                    target.amountRequired = Mathf.Max(5, totalExpected / numTargetsToSpawn);
                 }
             }
             
@@ -148,7 +180,6 @@ public class LevelManager : MonoBehaviour
 
         if (randomizeTargets)
         {
-            if (gridSpawner == null) gridSpawner = FindObjectOfType<GridSpawner>();
             if (gridSpawner != null && gridSpawner.prefabsToSpawn != null && gridSpawner.prefabsToSpawn.Count > 0)
             {
                 RandomizeTargetShapes();

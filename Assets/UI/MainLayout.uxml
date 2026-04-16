@@ -38,7 +38,7 @@
                         <engine:Label name="scoreText" text="Score: 0" picking-mode="Ignore" class="hud-value-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
                     </engine:VisualElement>
                 </engine:VisualElement>
-                <engine:VisualElement name="targetContainer" picking-mode="Ignore" class="target-list" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; width: 623px; height: 106px;"/>
+                <engine:VisualElement name="targetContainer" picking-mode="Ignore" class="target-list" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; width: 653px; height: 362px; align-items: center; justify-content: flex-start; align-content: auto; visibility: visible; overflow: visible; display: flex; flex-direction: column; flex-wrap: wrap;"/>
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="gamePausePanel" class="transparent-panel" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
