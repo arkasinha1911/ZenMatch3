@@ -24,6 +24,12 @@ public class ProgressionManager : MonoBehaviour
     [HideInInspector]
     public bool returnToMenu = true;
 
+    [Header("Lives System")]
+    public const int MAX_LIVES = 6;
+    public int currentLives { get; private set; } = 6;
+    
+    private const string LIVES_KEY = "PlayerLives";
+
     // "const" means this string is permanent and cannot be changed by the game. 
     // We use this key to safely ask the PlayerPrefs hardware for the "HighestUnlockedLevel" save file.
     private const string UNLOCKED_LEVEL_KEY = "HighestUnlockedLevel";
@@ -61,8 +67,32 @@ public class ProgressionManager : MonoBehaviour
         // If it finds nothing (first time playing), it cleanly defaults to "1".
         highestUnlockedLevel = PlayerPrefs.GetInt(UNLOCKED_LEVEL_KEY, 1);
         
+        // Load the stored lives, default to MAX_LIVES if it's their first time playing.
+        currentLives = PlayerPrefs.GetInt(LIVES_KEY, MAX_LIVES);
+
         // We set the current level to whatever their highest level is to save them time opening the menu!
         currentPlayingLevel = highestUnlockedLevel; 
+    }
+
+    /// <summary>
+    /// Call this when the player fails a level.
+    /// </summary>
+    public void LoseLife()
+    {
+        currentLives--;
+        if (currentLives < 0) currentLives = 0;
+        PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Call this to refill the player's lives back to max (e.g. for testing or waiting).
+    /// </summary>
+    public void RefillLives()
+    {
+        currentLives = MAX_LIVES;
+        PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+        PlayerPrefs.Save();
     }
 
     /// <summary>

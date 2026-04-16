@@ -36,12 +36,30 @@ public class MainMenuManager : MonoBehaviour
         Button backToMenuButton = root.Q<Button>("backToMenuButton");
         Button closeSettingsButton = root.Q<Button>("closeSettingsButton");
         Button exitButton = root.Q<Button>("exitButton");
+        Button resetLivesButton = root.Q<Button>("resetLivesButton");
 
         // Button Listeners
         if (playButton != null) playButton.clicked += ShowLevelSelect;
         if (settingsOpenButton != null) settingsOpenButton.clicked += ShowSettings;
         if (backToMenuButton != null) backToMenuButton.clicked += ShowMainMenu;
         if (closeSettingsButton != null) closeSettingsButton.clicked += ShowMainMenu;
+        
+        if (resetLivesButton != null)
+        {
+            resetLivesButton.clicked += () => 
+            {
+                if (ProgressionManager.Instance != null)
+                {
+                    ProgressionManager.Instance.RefillLives();
+                    Debug.Log("Lives Reset explicitly by Dev button!");
+                    // Need to refresh level menu to re-enable disabled buttons
+                    if (levelSelectPanel.style.display == DisplayStyle.Flex)
+                    {
+                        if (levelSelectUI != null) levelSelectUI.GenerateLevelButtons();
+                    }
+                }
+            };
+        }
         
         if (exitButton != null)
         {

@@ -51,6 +51,7 @@ public class LevelSelectUI : MonoBehaviour
 
             int currentLevelToSetup = i;
             bool isUnlocked = (currentLevelToSetup <= highestUnlocked);
+            bool hasLives = ProgressionManager.Instance != null && ProgressionManager.Instance.currentLives > 0;
 
             // Populate Text
             if (levelText != null)
@@ -93,7 +94,15 @@ public class LevelSelectUI : MonoBehaviour
 
                 if (isUnlocked)
                 {
-                    buttonComponent.clicked += () => OnLevelButtonClicked(currentLevelToSetup);
+                    buttonComponent.clicked += () => 
+                    {
+                        if (ProgressionManager.Instance != null && ProgressionManager.Instance.currentLives <= 0)
+                        {
+                            Debug.LogWarning("NO LIVES! GO RESET THEM IN THE SETTINGS MENU.");
+                            return; // PREVENT ENTRY!
+                        }
+                        OnLevelButtonClicked(currentLevelToSetup);
+                    };
                 }
             }
 

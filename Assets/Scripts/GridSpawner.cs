@@ -413,6 +413,9 @@ public class GridSpawner : MonoBehaviour
             if (AudioManager.Instance != null)
                 AudioManager.Instance.PlaySwapAudio();
 
+            // Consume a move for this action!
+            if (LevelManager.Instance != null) LevelManager.Instance.UseMove();
+
             // Run the huge bomb detonation code!
             yield return StartCoroutine(DetonateBombsCoroutine(p1, p2));
             
@@ -468,8 +471,12 @@ public class GridSpawner : MonoBehaviour
         else
         {
             // 6. IF A VALID MATCH WAS MADE:
-            // Send the list of matches into our master "Match Executioner" to blow them up and drop gravity!
-            StartCoroutine(ResolveMatchesCoroutine(matches));
+            // Consume a move!
+            if (LevelManager.Instance != null) LevelManager.Instance.UseMove();
+
+            // This triggers the massive chain reaction! (We pass initial matches since matches 
+            // recalculation will just return the same result but we avoid duplicate loops)
+            yield return StartCoroutine(ResolveMatchesCoroutine(matches));
         }
     }
 

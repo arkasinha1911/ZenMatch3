@@ -33,6 +33,11 @@ public class LevelManager : MonoBehaviour
     private VisualElement gamePausePanel;
     private Label timerText;
     private Label scoreText;
+    private Label movesText;
+    private Label livesText;
+
+    public int maxMoves = 20;
+    public int currentMoves;
 
     public bool IsGameActive { get; private set; } = true;
     public bool IsPaused { get; private set; } = false;
@@ -57,7 +62,9 @@ public class LevelManager : MonoBehaviour
             if (isChallengeLevel)
             {
                 // Challenge levels are much stricter on time and require more shapes!
-                countdownTimer = Mathf.Max(20f, 45f - (level * 2.0f)); 
+                // countdownTimer = Mathf.Max(20f, 45f - (level * 2.0f)); 
+                maxMoves = Mathf.Max(15, 30 - (level / 2));
+                
                 foreach (var target in targets)
                 {
                     target.amountRequired = 20 + (level * 5);
@@ -66,12 +73,16 @@ public class LevelManager : MonoBehaviour
             else
             {
                 // Standard progression
-                countdownTimer = Mathf.Max(30f, 60f - (level * 1.5f));
+                // countdownTimer = Mathf.Max(30f, 60f - (level * 1.5f));
+                maxMoves = Mathf.Max(20, 40 - (level / 3));
+                
                 foreach (var target in targets)
                 {
                     target.amountRequired = 10 + (level * 3);
                 }
             }
+            
+            currentMoves = maxMoves;
         }
 
         IsGameActive = true;
@@ -87,6 +98,8 @@ public class LevelManager : MonoBehaviour
             gamePausePanel = root.Q<VisualElement>("gamePausePanel");
             timerText = root.Q<Label>("timerText");
             scoreText = root.Q<Label>("scoreText");
+            movesText = root.Q<Label>("movesText");
+            livesText = root.Q<Label>("livesText");
             
             // Wire buttons if present
             Button nextLevelButton = root.Q<Button>("nextLevelButton");
@@ -201,22 +214,48 @@ public class LevelManager : MonoBehaviour
     {
         if (!IsGameActive || IsPaused) return;
 
-        countdownTimer -= Time.deltaTime;
-        if (countdownTimer <= 0f)
-        {
-            countdownTimer = 0f;
-            TriggerGameOver();
-        }
+        // --- PAUSED TIMER LOGIC ---
+        // countdownTimer -= Time.deltaTime;
+        // if (countdownTimer <= 0f)
+        // {
+        //     countdownTimer = 0f;
+        //     TriggerGameOver();
+        // }
 
         if (timerText != null)
         {
-            timerText.text = $"Time: {Mathf.CeilToInt(countdownTimer)}s";
+            // timerText.text = $"Time: {Mathf.CeilToInt(countdownTimer)}s";
+            timerText.style.display = DisplayStyle.None; // Hide timer
+        }
+
+        if (movesText != null)
+        {
+            movesText.text = $"Moves: {currentMoves}";
+        }
+
+        if (livesText != null && ProgressionManager.Instance != null)
+        {
+            livesText.text = $"Lives: {ProgressionManager.Instance.currentLives}/{ProgressionManager.MAX_LIVES}";
         }
 
         if (scoreText != null && ScoreManager.Instance != null)
         {
             scoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
         }
+        
+        // CHECK MOVE LIMIT FAIL STATE
+        if (currentMoves <= 0 && gridSpawner != null && !gridSpawner.isProcessing && IsGameActive)
+        {
+            // Since ReportPieceDestroyed would have already triggered a win if targets were met,
+            // sitting here with 0 moves and a settled board means we inevitably lost.
+            TriggerGameOver();
+        }
+    }
+
+    public void UseMove()
+    {
+        if (!IsGameActive || IsPaused) return;
+        currentMoves--;
     }
 
     public void ReportPieceDestroyed(int pieceType)
@@ -284,6 +323,12 @@ public class LevelManager : MonoBehaviour
         IsPaused = false;
         if (gameOverPanel != null) gameOverPanel.style.display = DisplayStyle.Flex;
         Time.timeScale = 0f; 
+        
+        // Penalty for losing!
+        if (ProgressionManager.Instance != null)
+        {
+            ProgressionManager.Instance.LoseLife();
+        }
     }
 
     public void LoadNextLevel()
