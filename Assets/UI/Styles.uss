@@ -103,6 +103,57 @@
     flex-direction: row;
 }
 
+/* --- PREMIUM HUD STYLING --- */
+.hud-glass-bar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    border-bottom-width: 5px;
+    border-color: rgba(255, 255, 255, 0.7);
+    padding: 15px 30px;
+}
+
+.pill-badge-gold {
+    background-color: #ffc233;
+    border-radius: 30px;
+    padding: 10px 35px;
+    margin: 5px;
+    border-width: 4px;
+    border-color: #e6a817;
+    align-items: center;
+}
+
+.pill-badge-blue {
+    background-color: #6bb9ff;
+    border-radius: 30px;
+    padding: 10px 35px;
+    margin: 5px;
+    border-width: 4px;
+    border-color: #4a9eeb;
+    align-items: center;
+}
+
+.pill-badge-red {
+    background-color: #ff6b6b;
+    border-radius: 20px;
+    padding: 5px 20px;
+    margin: 5px;
+    border-width: 3px;
+    border-color: #e55050;
+    align-items: center;
+}
+
+.hud-value-text {
+    font-size: 45px;
+    color: white;
+    -unity-font-style: bold;
+    -unity-text-outline-width: 2px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.3);
+}
+
 /* Individual Objective Layout */
 .objective-container {
     flex-direction: row;

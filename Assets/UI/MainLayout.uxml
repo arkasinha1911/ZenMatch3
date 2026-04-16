@@ -3,9 +3,9 @@
     <engine:VisualElement name="root" style="flex-grow: 1;">
         <engine:VisualElement name="mainMenuPanel" class="fullscreen-panel">
             <engine:Label text="ZenMatch" class="title-text"/>
-            <engine:Button name="playButton" text="Play" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 140px; letter-spacing: 5px; background-image: none; color: rgb(7, 33, 84);"/>
-            <engine:Button name="settingsOpenButton" text="Settings" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
-            <engine:Button name="exitButton" text="Exit" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
+            <engine:Button name="playButton" text="Play" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 231px; letter-spacing: 5px; background-image: none; color: rgb(7, 33, 84);"/>
+            <engine:Button name="settingsOpenButton" text="Settings" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 72px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
+            <engine:Button name="exitButton" text="Exit" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 70px; letter-spacing: 5px; color: rgb(7, 33, 84);"/>
         </engine:VisualElement>
         <engine:VisualElement name="levelSelectPanel" class="fullscreen-panel" style="display: none;">
             <engine:Label text="Select Level" class="heading-text"/>
@@ -21,20 +21,24 @@
                 <engine:Button name="closeSettingsButton" text="Close" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; color: rgb(7, 33, 84);"/>
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:VisualElement name="gameHUDPanel" class="transparent-panel" picking-mode="Ignore" style="display: none; align-items: flex-start; justify-content: flex-start;">
-            <engine:VisualElement class="hud-container" picking-mode="Ignore" style="width: 100%; flex-direction: row; justify-content: space-between;">
-                <engine:VisualElement name="hudButtons" picking-mode="Ignore" style="flex-direction: column;">
-                    <engine:VisualElement picking-mode="Ignore" style="flex-direction: row;">
-                        <engine:Button name="hudBackButton" text="Back" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; padding: 10px 20px; margin: 5px; color: rgb(7, 33, 84);"/>
-                        <engine:Button name="hudPauseButton" text="Pause" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; padding: 10px 20px; margin: 5px; color: rgb(7, 33, 84);"/>
+        <engine:VisualElement name="gameHUDPanel" picking-mode="Ignore" class="transparent-panel" style="display: none; align-items: flex-start; justify-content: flex-start;">
+            <engine:VisualElement picking-mode="Ignore" class="hud-glass-bar" style="height: 384px; width: 1080px;">
+                <engine:VisualElement name="hudButtons" picking-mode="Ignore" style="flex-direction: column; height: 366px; width: 328px;">
+                    <engine:VisualElement picking-mode="Ignore" style="flex-direction: row; height: 64px; width: 328px;">
+                        <engine:Button name="hudBackButton" text="Back" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; padding: 10px 20px; margin: 5px; color: rgb(7, 33, 84); width: 149px; height: 54px;"/>
+                        <engine:Button name="hudPauseButton" text="Pause" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; padding: 10px 20px; margin: 5px; color: rgb(7, 33, 84); height: 54px; width: 152px;"/>
                     </engine:VisualElement>
-                    <engine:Label name="livesText" text="Lives: 6/6" class="timer-text" picking-mode="Ignore" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 35px; color: rgb(215, 60, 60); margin-left: 15px;"/>
+                    <engine:VisualElement picking-mode="Ignore" class="pill-badge-red" style="margin-left: 10px; margin-top: 10px; flex-basis: 61px; flex-direction: column-reverse; flex-wrap: nowrap; height: 63px; width: 192px;">
+                        <engine:Label name="livesText" text="Lives: 6/6" picking-mode="Ignore" class="hud-value-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px;"/>
+                    </engine:VisualElement>
+                    <engine:VisualElement picking-mode="Ignore" class="pill-badge-gold" style="height: 88px; width: 277px; flex-direction: column; align-items: flex-start; justify-content: center; align-self: auto; align-content: center;">
+                        <engine:Label name="movesText" text="Moves: 20" picking-mode="Ignore" class="hud-value-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                    </engine:VisualElement>
+                    <engine:VisualElement picking-mode="Ignore" class="pill-badge-blue" style="align-items: flex-start;">
+                        <engine:Label name="scoreText" text="Score: 0" picking-mode="Ignore" class="hud-value-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                    </engine:VisualElement>
                 </engine:VisualElement>
-                <engine:VisualElement picking-mode="Ignore" style="flex-direction: column; align-items: center;">
-                    <engine:Label name="movesText" text="Moves: 20" class="timer-text" picking-mode="Ignore" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 55px; color: rgb(7, 33, 84);"/>
-                    <engine:Label name="scoreText" text="Score: 0" class="timer-text" picking-mode="Ignore" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 45px; color: rgb(7, 33, 84);"/>
-                </engine:VisualElement>
-                <engine:VisualElement name="targetContainer" class="target-list" picking-mode="Ignore" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px;"/>
+                <engine:VisualElement name="targetContainer" picking-mode="Ignore" class="target-list" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; width: 623px; height: 106px;"/>
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="gamePausePanel" class="transparent-panel" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
