@@ -191,3 +191,115 @@
     font-size: 14px;
     margin-top: 5px;
 }
+
+/* --- SHOP UI --- */
+.shop-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    padding: 8px 25px;
+    background-color: rgba(255, 215, 0, 0.15);
+    border-radius: 20px;
+    border-width: 2px;
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+.shop-card-row {
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.shop-card {
+    width: 220px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 18px;
+    padding: 15px;
+    margin: 8px;
+    align-items: center;
+    border-width: 3px;
+    border-color: rgba(0, 0, 0, 0.08);
+    transition: scale 0.1s;
+}
+
+.shop-card:hover {
+    scale: 1.03;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.shop-card-magnet {
+    border-color: #e74c3c;
+    background-color: rgba(231, 76, 60, 0.08);
+}
+
+.shop-card-xbomb {
+    border-color: #3498db;
+    background-color: rgba(52, 152, 219, 0.08);
+}
+
+.shop-card-areabomb {
+    border-color: #2ecc71;
+    background-color: rgba(46, 204, 113, 0.08);
+}
+
+.shop-card-icon {
+    font-size: 50px;
+    -unity-text-align: middle-center;
+    margin-bottom: 5px;
+}
+
+.shop-card-title {
+    font-size: 28px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 3px;
+}
+
+.shop-card-desc {
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.5);
+    -unity-text-align: middle-center;
+    margin-bottom: 8px;
+    white-space: normal;
+}
+
+.shop-card-owned {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: rgba(0, 0, 0, 0.4);
+    margin-bottom: 8px;
+}
+
+.shop-buy-button {
+    background-color: #ffc233;
+    border-radius: 12px;
+    color: rgb(7, 33, 84);
+    font-size: 22px;
+    -unity-font-style: bold;
+    padding: 8px 20px;
+    border-width: 0;
+    margin: 0;
+    transition: scale 0.1s;
+    width: 90%;
+}
+
+.shop-buy-button:hover {
+    background-color: #e6a817;
+    scale: 1.05;
+}
+
+.shop-buy-button:active {
+    background-color: #cc9410;
+    scale: 0.95;
+}
+
+.shop-feedback {
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-top: 5px;
+    height: 30px;
+}

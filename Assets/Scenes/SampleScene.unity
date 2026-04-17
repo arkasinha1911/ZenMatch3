@@ -252,7 +252,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -10}
+  m_LocalPosition: {x: 0, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -700,6 +700,8 @@ MonoBehaviour:
   noiseThreshold: 0.195
   centerBlankBias: 0.141
   blankAreaPrefab: {fileID: 4654262940945227369, guid: bb3b3ff945ae21647876bdac0604b556, type: 3}
+  drawGridBackgrounds: 1
+  gridBackgroundColor: {r: 0.1, g: 0.2, b: 0.4, a: 0.5}
   prefabsToSpawn:
   - {fileID: 4196628145204597246, guid: 27553447e4bcafb48a1131b45fc8916d, type: 3}
   - {fileID: 8514071769038930306, guid: b4d3eb498f6a85748a17b71b70047f2d, type: 3}
@@ -783,6 +785,8 @@ MonoBehaviour:
     amountCollected: 0
   uiDocument: {fileID: 2103789380}
   targetUIAsset: {fileID: 9197481963319205126, guid: 57700814310d7214995f2979401f8e6b, type: 3}
+  maxMoves: 20
+  currentMoves: 0
 --- !u!4 &1850095745
 Transform:
   m_ObjectHideFlags: 0

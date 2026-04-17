@@ -13,16 +13,51 @@
             <engine:Button name="backToMenuButton" text="Back" class="standard-button" style="margin-bottom: 20px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84); font-size: 40px;"/>
         </engine:VisualElement>
         <engine:VisualElement name="settingsPanel" class="fullscreen-panel" style="display: none;">
-            <engine:VisualElement class="modal-box">
-                <engine:Label text="Settings" class="heading-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84); font-size: 50px;"/>
-                <engine:Label text="Master Volume" style="font-size: 50px; -unity-font-style: bold; margin-bottom: 10px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84);"/>
-                <engine:Slider name="audioSlider" low-value="0" high-value="1" style="width: 300px; margin-bottom: 30px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px;"/>
-                <engine:Button name="resetLivesButton" text="Reset Lives (Dev)" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 35px; color: rgb(215, 60, 60); margin-bottom: 10px;"/>
-                <engine:Button name="closeSettingsButton" text="Close" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; color: rgb(7, 33, 84);"/>
-            </engine:VisualElement>
+            <engine:ScrollView style="flex-grow: 1; align-self: stretch; max-width: 800px; align-self: center; padding: 20px; width: 852px;">
+                <engine:Label text="Settings" class="heading-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84); font-size: 55px; -unity-text-align: middle-center;"/>
+                <engine:VisualElement style="align-items: center; margin-bottom: 20px;">
+                    <engine:Label text="Master Volume" style="font-size: 30px; -unity-font-style: bold; margin-bottom: 5px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84);"/>
+                    <engine:Slider name="audioSlider" low-value="0" high-value="1" style="width: 300px;"/>
+                </engine:VisualElement>
+                <engine:VisualElement style="height: 3px; background-color: rgba(0, 0, 0, 0.1); margin: 10px 0 20px 0; border-radius: 2px;"/>
+                <engine:Label text="SHOP" class="heading-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(7, 33, 84); font-size: 50px; -unity-text-align: middle-center; margin-bottom: 10px;"/>
+                <engine:VisualElement class="shop-header">
+                    <engine:Label text="★" style="font-size: 35px; color: rgb(255, 200, 0); margin-right: 10px;"/>
+                    <engine:Label name="lblTotalStars" text="0" style="font-size: 35px; -unity-font-style: bold; color: rgb(7, 33, 84); -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                </engine:VisualElement>
+                <engine:VisualElement class="shop-card-row">
+                    <engine:VisualElement class="shop-card shop-card-magnet">
+                        <engine:Label text="🧲" class="shop-card-icon" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Label text="Magnet" class="shop-card-title" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(231, 76, 60);"/>
+                        <engine:Label text="Clears all objective pieces instantly" class="shop-card-desc" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Label name="lblShopMagnetOwned" text="Owned: 0" class="shop-card-owned" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Button name="buyMagnetButton" text="★ 150" enable-rich-text="true" class="shop-buy-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="shop-card shop-card-xbomb">
+                        <engine:Label text="✖" class="shop-card-icon" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Label text="X-Bomb" class="shop-card-title" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(52, 152, 219);"/>
+                        <engine:Label text="Destroys all tiles along both diagonals" class="shop-card-desc" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Label name="lblShopXBombOwned" text="Owned: 0" class="shop-card-owned" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Button name="buyXBombButton" text="★ 50" class="shop-buy-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                    </engine:VisualElement>
+                    <engine:VisualElement class="shop-card shop-card-areabomb">
+                        <engine:Label text="💥" class="shop-card-icon" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Label text="Area Bomb" class="shop-card-title" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); color: rgb(46, 204, 113);"/>
+                        <engine:Label text="Blasts a 3x3 area around a target tile" class="shop-card-desc" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Label name="lblShopAreaBombOwned" text="Owned: 0" class="shop-card-owned" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                        <engine:Button name="buyAreaBombButton" text="★ 75" class="shop-buy-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                    </engine:VisualElement>
+                </engine:VisualElement>
+                <engine:Label name="lblShopFeedback" text="" class="shop-feedback" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
+                <engine:VisualElement style="height: 3px; background-color: rgba(0, 0, 0, 0.1); margin: 15px 0; border-radius: 2px;"/>
+                <engine:VisualElement style="align-items: center;">
+                    <engine:Button name="resetLivesButton" text="Reset Lives (Dev)" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 28px; color: rgb(215, 60, 60); margin-bottom: 5px;"/>
+                    <engine:Button name="closeSettingsButton" text="Close" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 40px; color: rgb(7, 33, 84);"/>
+                </engine:VisualElement>
+            </engine:ScrollView>
         </engine:VisualElement>
-        <engine:VisualElement name="gameHUDPanel" picking-mode="Ignore" class="transparent-panel" style="display: none; align-items: flex-start; justify-content: flex-start;">
-            <engine:VisualElement picking-mode="Ignore" class="hud-glass-bar" style="height: 384px; width: 1080px;">
+        <engine:VisualElement name="gameHUDPanel" picking-mode="Ignore" class="transparent-panel" style="display: none; align-items: stretch; justify-content: space-between; flex-direction: column; font-size: 14px;">
+            <engine:VisualElement picking-mode="Ignore" name="VisualElement" class="hud-glass-bar" style="height: 384px; width: 1080px;">
                 <engine:VisualElement name="hudButtons" picking-mode="Ignore" style="flex-direction: column; height: 366px; width: 328px;">
                     <engine:VisualElement picking-mode="Ignore" style="flex-direction: row; height: 64px; width: 328px;">
                         <engine:Button name="hudBackButton" text="Back" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; padding: 10px 20px; margin: 5px; color: rgb(7, 33, 84); width: 149px; height: 54px;"/>
@@ -38,7 +73,18 @@
                         <engine:Label name="scoreText" text="Score: 0" picking-mode="Ignore" class="hud-value-text" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;);"/>
                     </engine:VisualElement>
                 </engine:VisualElement>
-                <engine:VisualElement name="targetContainer" picking-mode="Ignore" class="target-list" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; width: 653px; height: 362px; align-items: center; justify-content: flex-start; align-content: auto; visibility: visible; overflow: visible; display: flex; flex-direction: column; flex-wrap: wrap;"/>
+                <engine:VisualElement name="targetContainer" picking-mode="Ignore" class="target-list" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 30px; width: 652px; height: 367px; align-items: center; justify-content: flex-start; align-content: auto; visibility: visible; overflow: visible; display: flex; flex-direction: column; flex-wrap: wrap;"/>
+            </engine:VisualElement>
+            <engine:VisualElement name="powerupContainer" style="flex-direction: row; align-items: center; justify-content: center; align-self: center; margin-bottom: 30px; padding: 10px 20px; background-color: rgba(255, 255, 255, 0.4); border-radius: 20px; border-width: 3px; border-color: rgba(255, 255, 255, 0.6); height: 139px; width: 1070px;">
+                <engine:Button name="btnMagnet" text="🧲" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 35px; margin: 0 8px; height: 100px; width: 250px; color: rgb(7, 33, 84); flex-direction: column; padding: 5px;">
+                    <engine:Label name="lblMagnetCount" text="0" picking-mode="Ignore" style="font-size: 30px; color: white; -unity-font-style: bold; -unity-text-align: middle-center; height: 89px; width: 96px;"/>
+                </engine:Button>
+                <engine:Button name="btnXBomb" text="✖" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 35px; margin: 0 8px; height: 100px; width: 250px; color: rgb(7, 33, 84); flex-direction: column; padding: 5px;">
+                    <engine:Label name="lblXBombCount" text="0" picking-mode="Ignore" style="font-size: 30px; color: white; -unity-font-style: bold; -unity-text-align: middle-center; height: 89px; width: 90px;"/>
+                </engine:Button>
+                <engine:Button name="btnAreaBomb" text="💥" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 35px; margin: 0 8px; height: 100px; width: 250px; color: rgb(7, 33, 84); flex-direction: column; padding: 5px;">
+                    <engine:Label name="lblAreaBombCount" text="0" picking-mode="Ignore" style="font-size: 30px; color: white; -unity-font-style: bold; -unity-text-align: middle-center; height: 89px; width: 87px;"/>
+                </engine:Button>
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:VisualElement name="gamePausePanel" class="transparent-panel" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
@@ -51,6 +97,11 @@
         <engine:VisualElement name="gameWinPanel" class="transparent-panel" style="display: none; background-color: rgba(0, 0, 0, 0.5);">
             <engine:VisualElement class="modal-box">
                 <engine:Label text="Level Complete!" class="heading-text" style="color: rgb(76, 175, 80);"/>
+                <engine:VisualElement name="starsEarnedContainer" style="flex-direction: row; justify-content: center; align-items: center; margin-bottom: 20px;">
+                    <engine:Label name="winStar1" text="☆" style="font-size: 70px; color: rgb(128, 128, 128); -unity-font-style: bold; margin: 0 8px; -unity-text-align: middle-center;"/>
+                    <engine:Label name="winStar2" text="☆" style="font-size: 70px; color: rgb(128, 128, 128); -unity-font-style: bold; margin: 0 8px; -unity-text-align: middle-center;"/>
+                    <engine:Label name="winStar3" text="☆" style="font-size: 70px; color: rgb(128, 128, 128); -unity-font-style: bold; margin: 0 8px; -unity-text-align: middle-center;"/>
+                </engine:VisualElement>
                 <engine:Button name="nextLevelButton" text="Next Level" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 40px; color: rgb(7, 33, 84);"/>
                 <engine:Button name="winMenuButton" text="Main Menu" class="standard-button" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Bangers.ttf?fileID=12800000&amp;guid=5dd49b3eacc540408c98eee0de38e0f1&amp;type=3#Bangers&quot;); font-size: 50px; color: rgb(7, 33, 84);"/>
             </engine:VisualElement>

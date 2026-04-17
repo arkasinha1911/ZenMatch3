@@ -48,6 +48,7 @@ public class LevelSelectUI : MonoBehaviour
             Button buttonComponent = newButton.Q<Button>("RootLevelButton");
             Label levelText = newButton.Q<Label>("levelText");
             Label scoreText = newButton.Q<Label>("scoreText");
+            VisualElement starsContainer = newButton.Q<VisualElement>("starsContainer");
 
             int currentLevelToSetup = i;
             bool isUnlocked = (currentLevelToSetup <= highestUnlocked);
@@ -60,17 +61,32 @@ public class LevelSelectUI : MonoBehaviour
                 if (!isUnlocked) levelText.text += " (Locked)";
             }
 
-            // Populate Score
-            if (scoreText != null)
+            // Populate Score and Stars
+            int stars = 0;
+            if (isUnlocked && ProgressionManager.Instance != null)
             {
-                if (isUnlocked && ProgressionManager.Instance != null)
+                int score = ProgressionManager.Instance.GetHighScore(currentLevelToSetup);
+                stars = ProgressionManager.Instance.GetLevelStars(currentLevelToSetup);
+                if (scoreText != null) scoreText.text = $"High Score: {score}";
+            }
+            else
+            {
+                if (scoreText != null) scoreText.text = "High Score: ???";
+            }
+
+            // Visually fill stars
+            if (starsContainer != null)
+            {
+                for (int s = 1; s <= 3; s++)
                 {
-                    int score = ProgressionManager.Instance.GetHighScore(currentLevelToSetup);
-                    scoreText.text = $"High Score: {score}";
-                }
-                else
-                {
-                    scoreText.text = "High Score: ???";
+                    Label starLabel = starsContainer.Q<Label>($"star{s}");
+                    if (starLabel != null)
+                    {
+                        starLabel.text = s <= stars ? "\u2605" : "\u2606"; // ★ vs ☆
+                        starLabel.style.color = s <= stars
+                            ? new StyleColor(new Color(1f, 0.84f, 0f))   // Bright gold
+                            : new StyleColor(new Color(0.5f, 0.5f, 0.5f)); // Dim grey
+                    }
                 }
             }
 

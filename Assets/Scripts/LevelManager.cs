@@ -42,6 +42,17 @@ public class LevelManager : MonoBehaviour
     public bool IsGameActive { get; private set; } = true;
     public bool IsPaused { get; private set; } = false;
 
+    [Header("Shop & Powerups")]
+    public string ActivePowerup { get; private set; } = null;
+    public bool IsPowerupTargetingMode => !string.IsNullOrEmpty(ActivePowerup);
+
+    private Button btnMagnet;
+    private Button btnXBomb;
+    private Button btnAreaBomb;
+    private Label lblMagnetCount;
+    private Label lblXBombCount;
+    private Label lblAreaBombCount;
+
     [HideInInspector]
     public static List<int> forcedTargetPieceTypes = null;
 
@@ -53,7 +64,7 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
-        if (gridSpawner == null) gridSpawner = FindObjectOfType<GridSpawner>();
+        if (gridSpawner == null) gridSpawner = FindAnyObjectByType<GridSpawner>();
 
         if (ProgressionManager.Instance != null)
         {
@@ -163,6 +174,19 @@ public class LevelManager : MonoBehaviour
             if (gameOverPanel != null) gameOverPanel.style.display = DisplayStyle.None;
             if (gamePausePanel != null) gamePausePanel.style.display = DisplayStyle.None;
 
+            // Powerup Buttons
+            btnMagnet = root.Q<Button>("btnMagnet");
+            btnXBomb = root.Q<Button>("btnXBomb");
+            btnAreaBomb = root.Q<Button>("btnAreaBomb");
+
+            lblMagnetCount = root.Q<Label>("lblMagnetCount");
+            lblXBombCount = root.Q<Label>("lblXBombCount");
+            lblAreaBombCount = root.Q<Label>("lblAreaBombCount");
+
+            if (btnMagnet != null) btnMagnet.clicked += OnMagnetClicked;
+            if (btnXBomb != null) btnXBomb.clicked += () => OnTargetedPowerupClicked("XBomb");
+            if (btnAreaBomb != null) btnAreaBomb.clicked += () => OnTargetedPowerupClicked("AreaBomb");
+
             // Generative UI for Objectives
             VisualElement targetContainer = root.Q<VisualElement>("targetContainer");
             if (targetContainer != null && targetUIAsset != null && targets.Count > 0)
@@ -187,6 +211,59 @@ public class LevelManager : MonoBehaviour
         }
 
         UpdateTargetsUI();
+        UpdatePowerupUI();
+    }
+
+    private void UpdatePowerupUI()
+    {
+        if (ProgressionManager.Instance == null) return;
+        if (lblMagnetCount != null) lblMagnetCount.text = ProgressionManager.Instance.MagnetCount.ToString();
+        if (lblXBombCount != null) lblXBombCount.text = ProgressionManager.Instance.XBombCount.ToString();
+        if (lblAreaBombCount != null) lblAreaBombCount.text = ProgressionManager.Instance.AreaBombCount.ToString();
+    }
+
+    private void OnMagnetClicked()
+    {
+        if (ProgressionManager.Instance != null && ProgressionManager.Instance.MagnetCount > 0 && !IsPaused && IsGameActive && !gridSpawner.isProcessing)
+        {
+            ProgressionManager.Instance.ConsumeItem("Magnet");
+            UpdatePowerupUI();
+            if (gridSpawner != null) gridSpawner.DetonateMagnet();
+        }
+    }
+
+    private void OnTargetedPowerupClicked(string powerupName)
+    {
+        if (IsPaused || !IsGameActive || gridSpawner.isProcessing) return;
+        
+        if (ProgressionManager.Instance != null)
+        {
+            int count = powerupName == "XBomb" ? ProgressionManager.Instance.XBombCount : ProgressionManager.Instance.AreaBombCount;
+            if (count > 0)
+            {
+                ActivePowerup = powerupName;
+                Debug.Log($"Targeting mode activated for: {powerupName}. Click a tile on the board!");
+            }
+        }
+    }
+    
+    public void ExecuteTargetedPowerup(GridPiece targetPiece)
+    {
+        if (!IsPowerupTargetingMode || targetPiece == null) return;
+
+        ProgressionManager.Instance.ConsumeItem(ActivePowerup);
+        UpdatePowerupUI();
+
+        if (ActivePowerup == "XBomb")
+        {
+            gridSpawner.DetonateXBomb(targetPiece.x, targetPiece.y);
+        }
+        else if (ActivePowerup == "AreaBomb")
+        {
+            gridSpawner.DetonateAreaBomb(targetPiece.x, targetPiece.y);
+        }
+
+        ActivePowerup = null; // Exit targeting mode
     }
 
     private void RandomizeTargetShapes()
@@ -338,6 +415,36 @@ public class LevelManager : MonoBehaviour
         if (ProgressionManager.Instance != null)
         {
             ProgressionManager.Instance.UnlockLevel(ProgressionManager.Instance.currentPlayingLevel + 1);
+
+            // Calculate Stars based on moves remaining
+            int earnedStars = 1;
+            if (currentMoves >= maxMoves * 0.5f) earnedStars = 3;
+            else if (currentMoves >= maxMoves * 0.25f) earnedStars = 2;
+            
+            ProgressionManager.Instance.AddStars(earnedStars);
+            ProgressionManager.Instance.SaveLevelStars(ProgressionManager.Instance.currentPlayingLevel, earnedStars);
+
+            // Update UI with Stars earned (visual star icons)
+            if (uiDocument != null)
+            {
+                var root = uiDocument.rootVisualElement;
+                var starsContainer = root.Q<VisualElement>("starsEarnedContainer");
+                if (starsContainer != null)
+                {
+                    for (int s = 1; s <= 3; s++)
+                    {
+                        var starLabel = starsContainer.Q<Label>($"winStar{s}");
+                        if (starLabel != null)
+                        {
+                            starLabel.text = s <= earnedStars ? "\u2605" : "\u2606"; // ★ vs ☆
+                            starLabel.style.color = s <= earnedStars
+                                ? new StyleColor(new Color(1f, 0.84f, 0f))   // Bright gold
+                                : new StyleColor(new Color(0.5f, 0.5f, 0.5f)); // Dim grey
+                        }
+                    }
+                }
+            }
+
             if (ScoreManager.Instance != null)
             {
                 ProgressionManager.Instance.SaveHighScore(

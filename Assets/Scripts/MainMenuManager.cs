@@ -18,6 +18,11 @@ public class MainMenuManager : MonoBehaviour
     private VisualElement levelSelectPanel;
     private VisualElement settingsPanel;
     private VisualElement gameHUDPanel;
+    private Label lblTotalStars;
+    private Label lblShopMagnetOwned;
+    private Label lblShopXBombOwned;
+    private Label lblShopAreaBombOwned;
+    private Label lblShopFeedback;
 
     private void Start()
     {
@@ -38,11 +43,25 @@ public class MainMenuManager : MonoBehaviour
         Button exitButton = root.Q<Button>("exitButton");
         Button resetLivesButton = root.Q<Button>("resetLivesButton");
 
+        // Shop UI
+        lblTotalStars = root.Q<Label>("lblTotalStars");
+        lblShopMagnetOwned = root.Q<Label>("lblShopMagnetOwned");
+        lblShopXBombOwned = root.Q<Label>("lblShopXBombOwned");
+        lblShopAreaBombOwned = root.Q<Label>("lblShopAreaBombOwned");
+        lblShopFeedback = root.Q<Label>("lblShopFeedback");
+        Button buyMagnetButton = root.Q<Button>("buyMagnetButton");
+        Button buyXBombButton = root.Q<Button>("buyXBombButton");
+        Button buyAreaBombButton = root.Q<Button>("buyAreaBombButton");
+
         // Button Listeners
         if (playButton != null) playButton.clicked += ShowLevelSelect;
         if (settingsOpenButton != null) settingsOpenButton.clicked += ShowSettings;
         if (backToMenuButton != null) backToMenuButton.clicked += ShowMainMenu;
         if (closeSettingsButton != null) closeSettingsButton.clicked += ShowMainMenu;
+        
+        if (buyMagnetButton != null) buyMagnetButton.clicked += () => TryBuyItem("Magnet", 150);
+        if (buyXBombButton != null) buyXBombButton.clicked += () => TryBuyItem("XBomb", 50);
+        if (buyAreaBombButton != null) buyAreaBombButton.clicked += () => TryBuyItem("AreaBomb", 75);
         
         if (resetLivesButton != null)
         {
@@ -79,6 +98,39 @@ public class MainMenuManager : MonoBehaviour
         {
             ShowMainMenu();
         }
+    }
+
+    private void TryBuyItem(string item, int cost)
+    {
+        if (ProgressionManager.Instance == null) return;
+
+        if (ProgressionManager.Instance.BuyItem(item, cost))
+        {
+            UpdateShopUI();
+            SetFeedback($"Purchased {item}!", new Color(0.18f, 0.8f, 0.44f));
+        }
+        else
+        {
+            SetFeedback("Not enough stars!", new Color(0.91f, 0.3f, 0.24f));
+        }
+    }
+
+    private void SetFeedback(string msg, Color color)
+    {
+        if (lblShopFeedback != null)
+        {
+            lblShopFeedback.text = msg;
+            lblShopFeedback.style.color = new StyleColor(color);
+        }
+    }
+
+    private void UpdateShopUI()
+    {
+        if (ProgressionManager.Instance == null) return;
+        if (lblTotalStars != null) lblTotalStars.text = ProgressionManager.Instance.TotalStars.ToString();
+        if (lblShopMagnetOwned != null) lblShopMagnetOwned.text = $"Owned: {ProgressionManager.Instance.MagnetCount}";
+        if (lblShopXBombOwned != null) lblShopXBombOwned.text = $"Owned: {ProgressionManager.Instance.XBombCount}";
+        if (lblShopAreaBombOwned != null) lblShopAreaBombOwned.text = $"Owned: {ProgressionManager.Instance.AreaBombCount}";
     }
 
     public void HideAllMenus()
@@ -119,6 +171,9 @@ public class MainMenuManager : MonoBehaviour
 
     public void ShowSettings()
     {
+        UpdateShopUI();
+        if (lblShopFeedback != null) lblShopFeedback.text = "";
+
         if (mainMenuPanel != null) mainMenuPanel.style.display = DisplayStyle.None;
         if (levelSelectPanel != null) levelSelectPanel.style.display = DisplayStyle.None;
         if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.Flex;

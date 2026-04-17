@@ -30,6 +30,17 @@ public class ProgressionManager : MonoBehaviour
     
     private const string LIVES_KEY = "PlayerLives";
 
+    [Header("Currency & Shop")]
+    public int TotalStars { get; private set; } = 0;
+    public int MagnetCount { get; private set; } = 0;
+    public int XBombCount { get; private set; } = 0;
+    public int AreaBombCount { get; private set; } = 0;
+
+    private const string STARS_KEY = "PlayerStars";
+    private const string MAGNET_KEY = "MagnetCount";
+    private const string XBOMB_KEY = "XBombCount";
+    private const string AREABOMB_KEY = "AreaBombCount";
+
     // "const" means this string is permanent and cannot be changed by the game. 
     // We use this key to safely ask the PlayerPrefs hardware for the "HighestUnlockedLevel" save file.
     private const string UNLOCKED_LEVEL_KEY = "HighestUnlockedLevel";
@@ -69,6 +80,12 @@ public class ProgressionManager : MonoBehaviour
         
         // Load the stored lives, default to MAX_LIVES if it's their first time playing.
         currentLives = PlayerPrefs.GetInt(LIVES_KEY, MAX_LIVES);
+
+        // Load Shop & Currency
+        TotalStars = PlayerPrefs.GetInt(STARS_KEY, 0);
+        MagnetCount = PlayerPrefs.GetInt(MAGNET_KEY, 0);
+        XBombCount = PlayerPrefs.GetInt(XBOMB_KEY, 0);
+        AreaBombCount = PlayerPrefs.GetInt(AREABOMB_KEY, 0);
 
         // We set the current level to whatever their highest level is to save them time opening the menu!
         currentPlayingLevel = highestUnlockedLevel; 
@@ -147,5 +164,62 @@ public class ProgressionManager : MonoBehaviour
     {
         // Re-calculate the unique string (e.g. "HighScore_Level_1") and fetch it. Defaults to 0 if no record exists.
         return PlayerPrefs.GetInt($"HighScore_Level_{level}", 0);
+    }
+
+    /// <summary>
+    /// Adds stars to the player's bank and saves safely.
+    /// </summary>
+    public void AddStars(int amount)
+    {
+        TotalStars += amount;
+        PlayerPrefs.SetInt(STARS_KEY, TotalStars);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Deducts stars and adds an item to inventory if affordable.
+    /// </summary>
+    public bool BuyItem(string itemType, int cost)
+    {
+        if (TotalStars >= cost)
+        {
+            TotalStars -= cost;
+            PlayerPrefs.SetInt(STARS_KEY, TotalStars);
+            
+            if (itemType == "Magnet") { MagnetCount++; PlayerPrefs.SetInt(MAGNET_KEY, MagnetCount); }
+            else if (itemType == "XBomb") { XBombCount++; PlayerPrefs.SetInt(XBOMB_KEY, XBombCount); }
+            else if (itemType == "AreaBomb") { AreaBombCount++; PlayerPrefs.SetInt(AREABOMB_KEY, AreaBombCount); }
+            
+            PlayerPrefs.Save();
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Spends an item from inventory to spawn it on the board.
+    /// </summary>
+    public void ConsumeItem(string itemType)
+    {
+        if (itemType == "Magnet" && MagnetCount > 0) { MagnetCount--; PlayerPrefs.SetInt(MAGNET_KEY, MagnetCount); }
+        else if (itemType == "XBomb" && XBombCount > 0) { XBombCount--; PlayerPrefs.SetInt(XBOMB_KEY, XBombCount); }
+        else if (itemType == "AreaBomb" && AreaBombCount > 0) { AreaBombCount--; PlayerPrefs.SetInt(AREABOMB_KEY, AreaBombCount); }
+        PlayerPrefs.Save();
+    }
+
+    public void SaveLevelStars(int level, int stars)
+    {
+        string key = $"LevelStars_{level}";
+        int previousStars = PlayerPrefs.GetInt(key, 0);
+        if (stars > previousStars)
+        {
+            PlayerPrefs.SetInt(key, stars);
+            PlayerPrefs.Save();
+        }
+    }
+
+    public int GetLevelStars(int level)
+    {
+        return PlayerPrefs.GetInt($"LevelStars_{level}", 0);
     }
 }

@@ -597,6 +597,117 @@ public class GridSpawner : MonoBehaviour
         yield return StartCoroutine(ResolveMatchesCoroutine(emptyMatchList, false)); // Force a gravity pass
     }
 
+    // ---------------------------------------------------------
+    // EXTERNAL SHOP POWERUPS
+    // ---------------------------------------------------------
+
+    public void DetonateAreaBomb(int cx, int cy)
+    {
+        if (isProcessing) return;
+        List<GridPiece> targets = new List<GridPiece>();
+        for (int x = cx - 1; x <= cx + 1; x++)
+        {
+            for (int y = cy - 1; y <= cy + 1; y++)
+            {
+                GridPiece p = GetPieceAt(x, y);
+                if (p != null) targets.Add(p);
+            }
+        }
+        StartCoroutine(ExecuteExternalPowerupCoroutine(targets));
+    }
+
+    public void DetonateXBomb(int cx, int cy)
+    {
+        if (isProcessing) return;
+        List<GridPiece> targets = new List<GridPiece>();
+        int maxDist = Mathf.Max(columns, rows);
+        for (int i = 0; i < maxDist; i++)
+        {
+            if (i == 0) 
+            {
+                GridPiece p = GetPieceAt(cx, cy);
+                if (p != null && !targets.Contains(p)) targets.Add(p);
+                continue;
+            }
+            GridPiece p1 = GetPieceAt(cx + i, cy + i); if (p1 != null && !targets.Contains(p1)) targets.Add(p1);
+            GridPiece p2 = GetPieceAt(cx - i, cy + i); if (p2 != null && !targets.Contains(p2)) targets.Add(p2);
+            GridPiece p3 = GetPieceAt(cx + i, cy - i); if (p3 != null && !targets.Contains(p3)) targets.Add(p3);
+            GridPiece p4 = GetPieceAt(cx - i, cy - i); if (p4 != null && !targets.Contains(p4)) targets.Add(p4);
+        }
+        StartCoroutine(ExecuteExternalPowerupCoroutine(targets));
+    }
+
+    public void DetonateMagnet()
+    {
+        if (isProcessing || LevelManager.Instance == null) return;
+        
+        List<GridPiece> targets = new List<GridPiece>();
+        List<int> neededTypes = new List<int>();
+        
+        foreach (var target in LevelManager.Instance.targets)
+        {
+            if (target.amountCollected < target.amountRequired)
+            {
+                neededTypes.Add(target.pieceType);
+            }
+        }
+        
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                GridPiece p = GetPieceAt(x, y);
+                if (p != null && neededTypes.Contains(p.pieceType))
+                {
+                    targets.Add(p);
+                }
+            }
+        }
+        
+        StartCoroutine(ExecuteExternalPowerupCoroutine(targets));
+    }
+
+    private IEnumerator ExecuteExternalPowerupCoroutine(List<GridPiece> toDestroy)
+    {
+        isProcessing = true;
+
+        List<GridPiece> distinctToDestroy = new List<GridPiece>();
+        foreach (var p in toDestroy)
+        {
+            if (!distinctToDestroy.Contains(p) && p != null)
+                distinctToDestroy.Add(p);
+        }
+
+        foreach (var match in distinctToDestroy)
+        {
+            if (match.gameObject != null)
+            {
+                if (LevelManager.Instance != null && match.pieceType >= 0)
+                    LevelManager.Instance.ReportPieceDestroyed(match.pieceType);
+
+                if (explosionParticlePrefab != null)
+                    Instantiate(explosionParticlePrefab, match.gameObject.transform.position, Quaternion.identity);
+
+                grid[match.x, match.y] = null;
+                Destroy(match.gameObject);
+            }
+        }
+
+        if (ScoreManager.Instance != null && distinctToDestroy.Count > 0)
+            ScoreManager.Instance.AddScore(distinctToDestroy.Count * 10);
+
+        if (AudioManager.Instance != null && distinctToDestroy.Count > 0)
+            AudioManager.Instance.PlayMatchAudio();
+
+        if (CameraShake.Instance != null && distinctToDestroy.Count > 0)
+            CameraShake.Instance.Shake();
+
+        yield return new WaitForSeconds(0.1f);
+
+        List<MatchResult> emptyMatchList = new List<MatchResult>();
+        yield return StartCoroutine(ResolveMatchesCoroutine(emptyMatchList, false));
+    }
+
     /// <summary>
     /// Calculates exactly what a specific powerup is touching!
     /// </summary>

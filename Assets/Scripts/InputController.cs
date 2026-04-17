@@ -74,6 +74,14 @@ public class InputController : MonoBehaviour
                 // If it was a valid piece, officially unlock our "Waiting for Swipe" mode!
                 if (touchedPiece != null)
                 {
+                    // --- POWERUP TARGETING OVERRIDE ---
+                    if (LevelManager.Instance != null && LevelManager.Instance.IsPowerupTargetingMode)
+                    {
+                        LevelManager.Instance.ExecuteTargetedPowerup(touchedPiece);
+                        ResetSwipe(); // Cleanup so we don't start swiping
+                        return;
+                    }
+
                     isSwiping = true;
                 }
             }
