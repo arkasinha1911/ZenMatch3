@@ -15,6 +15,12 @@ public class LevelSelectUI : MonoBehaviour
 
     public string gameplaySceneName = "SampleScene";
 
+    // Cached UI elements for the lives display
+    private VisualElement noLivesOverlay;
+    private Label noLivesTimerLabel;
+    private Label noLivesInfoLabel;
+    private ScrollView levelScrollView;
+    private bool wasOutOfLives = false;
     /// <summary>
     /// Now called securely by MainMenuManager when the player opens the Level Select Screen.
     /// </summary>
@@ -23,11 +29,20 @@ public class LevelSelectUI : MonoBehaviour
         if (uiDocument == null || levelButtonTemplate == null) return;
         
         var root = uiDocument.rootVisualElement;
-        var scrollView = root.Q<ScrollView>("levelScrollView");
-        if (scrollView == null) return;
+        levelScrollView = root.Q<ScrollView>("levelScrollView");
+        if (levelScrollView == null) return;
 
         // 1. Clear old UI
-        scrollView.Clear();
+        levelScrollView.Clear();
+
+        // Remove old no-lives overlay if it exists
+        var levelSelectPanel = root.Q<VisualElement>("levelSelectPanel");
+        if (noLivesOverlay != null && levelSelectPanel != null)
+        {
+            if (noLivesOverlay.parent != null)
+                noLivesOverlay.parent.Remove(noLivesOverlay);
+            noLivesOverlay = null;
+        }
 
         // 2. Data Lookup
         int highestUnlocked = 1;
@@ -53,6 +68,7 @@ public class LevelSelectUI : MonoBehaviour
             int currentLevelToSetup = i;
             bool isUnlocked = (currentLevelToSetup <= highestUnlocked);
             bool hasLives = ProgressionManager.Instance != null && ProgressionManager.Instance.currentLives > 0;
+            bool isPlayable = isUnlocked && hasLives;
 
             // Populate Text
             if (levelText != null)
@@ -93,7 +109,13 @@ public class LevelSelectUI : MonoBehaviour
             // Action Wiring and Styling
             if (buttonComponent != null)
             {
-                buttonComponent.SetEnabled(isUnlocked); // Replaces standard interactable property
+                buttonComponent.SetEnabled(isPlayable);
+                
+                // Grey out buttons when no lives available
+                if (!hasLives && isUnlocked)
+                {
+                    buttonComponent.style.opacity = 0.4f;
+                }
                 
                 if (currentLevelToSetup % 10 == 0)
                 {
@@ -123,7 +145,98 @@ public class LevelSelectUI : MonoBehaviour
             }
 
             // Add the fully constructed widget into the ScrollView!
-            scrollView.Add(newButton);
+            levelScrollView.Add(newButton);
+        }
+
+        // --- NO LIVES OVERLAY ---
+        // Build and show a banner if the player is out of lives
+        if (ProgressionManager.Instance != null && ProgressionManager.Instance.currentLives <= 0)
+        {
+            BuildNoLivesOverlay(levelSelectPanel);
+            wasOutOfLives = true;
+        }
+        else
+        {
+            wasOutOfLives = false;
+        }
+    }
+
+    /// <summary>
+    /// Builds a floating overlay banner on the level select screen
+    /// telling the player they have no lives and showing a countdown timer.
+    /// </summary>
+    private void BuildNoLivesOverlay(VisualElement parent)
+    {
+        if (parent == null) return;
+
+        noLivesOverlay = new VisualElement();
+        noLivesOverlay.style.position = Position.Absolute;
+        noLivesOverlay.style.top = 80;
+        noLivesOverlay.style.left = 0;
+        noLivesOverlay.style.right = 0;
+        noLivesOverlay.style.alignItems = Align.Center;
+        noLivesOverlay.style.justifyContent = Justify.Center;
+        noLivesOverlay.pickingMode = PickingMode.Ignore;
+
+        var banner = new VisualElement();
+        banner.style.backgroundColor = new StyleColor(new Color(0.85f, 0.15f, 0.15f, 0.95f));
+        banner.style.borderTopLeftRadius = 20;
+        banner.style.borderTopRightRadius = 20;
+        banner.style.borderBottomLeftRadius = 20;
+        banner.style.borderBottomRightRadius = 20;
+        banner.style.paddingTop = 20;
+        banner.style.paddingBottom = 20;
+        banner.style.paddingLeft = 40;
+        banner.style.paddingRight = 40;
+        banner.style.alignItems = Align.Center;
+        banner.pickingMode = PickingMode.Ignore;
+
+        var heartIcon = new Label("💔");
+        heartIcon.style.fontSize = 50;
+        heartIcon.style.unityTextAlign = TextAnchor.MiddleCenter;
+        heartIcon.pickingMode = PickingMode.Ignore;
+        banner.Add(heartIcon);
+
+        noLivesInfoLabel = new Label("No Lives Remaining!");
+        noLivesInfoLabel.style.fontSize = 36;
+        noLivesInfoLabel.style.color = Color.white;
+        noLivesInfoLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        noLivesInfoLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        noLivesInfoLabel.style.marginBottom = 8;
+        noLivesInfoLabel.pickingMode = PickingMode.Ignore;
+        banner.Add(noLivesInfoLabel);
+
+        noLivesTimerLabel = new Label("Next life in: --:--");
+        noLivesTimerLabel.style.fontSize = 30;
+        noLivesTimerLabel.style.color = new StyleColor(new Color(1f, 0.9f, 0.7f));
+        noLivesTimerLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+        noLivesTimerLabel.pickingMode = PickingMode.Ignore;
+        banner.Add(noLivesTimerLabel);
+
+        noLivesOverlay.Add(banner);
+        parent.Add(noLivesOverlay);
+    }
+
+    private void Update()
+    {
+        // Update the countdown timer label if the overlay is showing
+        if (noLivesTimerLabel != null && noLivesOverlay != null && ProgressionManager.Instance != null)
+        {
+            if (ProgressionManager.Instance.currentLives > 0)
+            {
+                // A life just regenerated! Auto-refresh the level select screen.
+                if (wasOutOfLives)
+                {
+                    wasOutOfLives = false;
+                    GenerateLevelButtons();
+                }
+                return;
+            }
+
+            int secondsLeft = ProgressionManager.Instance.GetSecondsUntilNextLife();
+            int minutes = secondsLeft / 60;
+            int seconds = secondsLeft % 60;
+            noLivesTimerLabel.text = $"Next life in: {minutes:D2}:{seconds:D2}";
         }
     }
 

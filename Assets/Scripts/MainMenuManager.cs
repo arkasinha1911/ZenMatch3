@@ -24,6 +24,11 @@ public class MainMenuManager : MonoBehaviour
     private Label lblShopAreaBombOwned;
     private Label lblShopFeedback;
 
+    // Lives display elements
+    private Label livesDisplayLabel;
+    private Label livesTimerLabel;
+    private VisualElement livesContainer;
+
     private void Start()
     {
         if (uiDocument == null) return;
@@ -97,6 +102,90 @@ public class MainMenuManager : MonoBehaviour
         else
         {
             ShowMainMenu();
+        }
+
+        // Build the lives display on the main menu
+        BuildLivesDisplay(root);
+    }
+
+    /// <summary>
+    /// Builds a persistent hearts + timer display at the top of the main menu.
+    /// </summary>
+    private void BuildLivesDisplay(VisualElement root)
+    {
+        if (root == null) return;
+
+        livesContainer = new VisualElement();
+        livesContainer.name = "livesDisplayContainer";
+        livesContainer.style.position = Position.Absolute;
+        livesContainer.style.top = 15;
+        livesContainer.style.right = 20;
+        livesContainer.style.alignItems = Align.FlexEnd;
+        livesContainer.style.flexDirection = FlexDirection.Column;
+        livesContainer.pickingMode = PickingMode.Ignore;
+
+        livesDisplayLabel = new Label();
+        livesDisplayLabel.style.fontSize = 28;
+        livesDisplayLabel.style.color = Color.white;
+        livesDisplayLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+        livesDisplayLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+        livesDisplayLabel.style.textShadow = new TextShadow { offset = new Vector2(1, 1), blurRadius = 2, color = Color.black };
+        livesDisplayLabel.pickingMode = PickingMode.Ignore;
+        livesContainer.Add(livesDisplayLabel);
+
+        livesTimerLabel = new Label();
+        livesTimerLabel.style.fontSize = 22;
+        livesTimerLabel.style.color = new StyleColor(new Color(1f, 0.85f, 0.5f));
+        livesTimerLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+        livesTimerLabel.style.textShadow = new TextShadow { offset = new Vector2(1, 1), blurRadius = 2, color = Color.black };
+        livesTimerLabel.pickingMode = PickingMode.Ignore;
+        livesContainer.Add(livesTimerLabel);
+
+        root.Add(livesContainer);
+    }
+
+    private void Update()
+    {
+        if (ProgressionManager.Instance == null) return;
+
+        // Update lives display every frame
+        int lives = ProgressionManager.Instance.currentLives;
+        int max = ProgressionManager.MAX_LIVES;
+
+        if (livesDisplayLabel != null)
+        {
+            // Build heart string: filled hearts for current lives, empty for missing
+            string hearts = "";
+            for (int i = 0; i < max; i++)
+            {
+                hearts += i < lives ? "\u2764 " : "\u2661 "; // ❤ vs ♡
+            }
+            livesDisplayLabel.text = hearts.Trim();
+
+            // Color changes based on urgency
+            if (lives == 0)
+                livesDisplayLabel.style.color = new StyleColor(new Color(1f, 0.3f, 0.3f));
+            else if (lives <= 2)
+                livesDisplayLabel.style.color = new StyleColor(new Color(1f, 0.7f, 0.4f));
+            else
+                livesDisplayLabel.style.color = new StyleColor(Color.white);
+        }
+
+        if (livesTimerLabel != null)
+        {
+            if (lives < max)
+            {
+                int secondsLeft = ProgressionManager.Instance.GetSecondsUntilNextLife();
+                int minutes = secondsLeft / 60;
+                int seconds = secondsLeft % 60;
+                livesTimerLabel.text = $"Next \u2764 in {minutes:D2}:{seconds:D2}";
+                livesTimerLabel.style.display = DisplayStyle.Flex;
+            }
+            else
+            {
+                livesTimerLabel.text = "";
+                livesTimerLabel.style.display = DisplayStyle.None;
+            }
         }
     }
 

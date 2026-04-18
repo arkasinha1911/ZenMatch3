@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 /// <summary>
 /// The ProgressionManager handles all "Meta-Game" data, meaning things that persist over long periods of time.
@@ -29,6 +30,13 @@ public class ProgressionManager : MonoBehaviour
     public int currentLives { get; private set; } = 6;
     
     private const string LIVES_KEY = "PlayerLives";
+    private const string LIVES_TIMESTAMP_KEY = "LivesTimestamp";
+    
+    /// <summary>
+    /// How many real-world seconds between each life regeneration.
+    /// 1800 seconds = 30 minutes.
+    /// </summary>
+    public const int LIFE_REGEN_SECONDS = 1800;
 
     [Header("Currency & Shop")]
     public int TotalStars { get; private set; } = 0;
@@ -87,8 +95,106 @@ public class ProgressionManager : MonoBehaviour
         XBombCount = PlayerPrefs.GetInt(XBOMB_KEY, 0);
         AreaBombCount = PlayerPrefs.GetInt(AREABOMB_KEY, 0);
 
+        // Regenerate any lives that accumulated while the game was closed!
+        RegenerateOfflineLives();
+
         // We set the current level to whatever their highest level is to save them time opening the menu!
         currentPlayingLevel = highestUnlockedLevel; 
+    }
+
+    /// <summary>
+    /// Checks how much real time has passed since lives dropped below max,
+    /// and grants 1 life per 30 minutes that elapsed (even while the app was closed).
+    /// </summary>
+    private void RegenerateOfflineLives()
+    {
+        if (currentLives >= MAX_LIVES) return; // Already full, nothing to regenerate.
+
+        string savedTimestamp = PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "");
+        if (string.IsNullOrEmpty(savedTimestamp)) return; // No timestamp saved, skip.
+
+        DateTime lastLossTime;
+        if (!DateTime.TryParse(savedTimestamp, out lastLossTime)) return; // Corrupted timestamp, skip.
+
+        double secondsElapsed = (DateTime.UtcNow - lastLossTime).TotalSeconds;
+        int livesToAdd = (int)(secondsElapsed / LIFE_REGEN_SECONDS);
+
+        if (livesToAdd > 0)
+        {
+            currentLives = Mathf.Min(currentLives + livesToAdd, MAX_LIVES);
+            PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+
+            if (currentLives >= MAX_LIVES)
+            {
+                // Fully regenerated! Clear the timestamp.
+                PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY);
+            }
+            else
+            {
+                // Still not full — advance the saved timestamp by however many lives were granted
+                // so the "remainder" time carries forward correctly.
+                DateTime advancedTime = lastLossTime.AddSeconds(livesToAdd * LIFE_REGEN_SECONDS);
+                PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, advancedTime.ToString("o"));
+            }
+            PlayerPrefs.Save();
+        }
+    }
+
+    /// <summary>
+    /// Called every frame by the UI to tick the live regeneration timer in real-time.
+    /// Grants 1 life when the timer reaches 0 and restarts the cycle.
+    /// </summary>
+    private void Update()
+    {
+        if (currentLives < MAX_LIVES)
+        {
+            string savedTimestamp = PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "");
+            if (!string.IsNullOrEmpty(savedTimestamp))
+            {
+                DateTime lastLossTime;
+                if (DateTime.TryParse(savedTimestamp, out lastLossTime))
+                {
+                    double secondsElapsed = (DateTime.UtcNow - lastLossTime).TotalSeconds;
+                    if (secondsElapsed >= LIFE_REGEN_SECONDS)
+                    {
+                        // Grant a life in real-time!
+                        currentLives = Mathf.Min(currentLives + 1, MAX_LIVES);
+                        PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+
+                        if (currentLives >= MAX_LIVES)
+                        {
+                            PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY);
+                        }
+                        else
+                        {
+                            // Advance timestamp for the next cycle
+                            DateTime advancedTime = lastLossTime.AddSeconds(LIFE_REGEN_SECONDS);
+                            PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, advancedTime.ToString("o"));
+                        }
+                        PlayerPrefs.Save();
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Returns the number of seconds remaining until the next life regenerates.
+    /// Returns 0 if lives are already full.
+    /// </summary>
+    public int GetSecondsUntilNextLife()
+    {
+        if (currentLives >= MAX_LIVES) return 0;
+
+        string savedTimestamp = PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "");
+        if (string.IsNullOrEmpty(savedTimestamp)) return LIFE_REGEN_SECONDS;
+
+        DateTime lastLossTime;
+        if (!DateTime.TryParse(savedTimestamp, out lastLossTime)) return LIFE_REGEN_SECONDS;
+
+        double secondsElapsed = (DateTime.UtcNow - lastLossTime).TotalSeconds;
+        int remaining = LIFE_REGEN_SECONDS - (int)secondsElapsed;
+        return Mathf.Max(0, remaining);
     }
 
     /// <summary>
@@ -96,9 +202,23 @@ public class ProgressionManager : MonoBehaviour
     /// </summary>
     public void LoseLife()
     {
+        bool wasFullBefore = (currentLives >= MAX_LIVES);
         currentLives--;
         if (currentLives < 0) currentLives = 0;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+
+        // If this is the first life lost from a full tank, stamp the current UTC time.
+        // This starts the regeneration countdown clock.
+        if (wasFullBefore && currentLives < MAX_LIVES)
+        {
+            PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, DateTime.UtcNow.ToString("o"));
+        }
+        // If there was no timestamp yet (edge case), set one now
+        else if (string.IsNullOrEmpty(PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "")))
+        {
+            PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, DateTime.UtcNow.ToString("o"));
+        }
+
         PlayerPrefs.Save();
     }
 
@@ -109,6 +229,7 @@ public class ProgressionManager : MonoBehaviour
     {
         currentLives = MAX_LIVES;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+        PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY); // Clear regen timer since we're full
         PlayerPrefs.Save();
     }
 
