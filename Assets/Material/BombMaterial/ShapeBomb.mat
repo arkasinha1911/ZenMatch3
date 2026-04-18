@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ShapeBomb
-  m_Shader: {fileID: 4800000, guid: e260cfa7296ee7642b167f1eb5be5023, type: 3}
+  m_Shader: {fileID: 4800000, guid: 9a15b3ec1ab701b469b3a6425b9a6379, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -42,6 +42,19 @@ Material:
     m_Ints: []
     m_Floats:
     - _EnableExternalAlpha: 0
+    - _GlowIntensity: 0.83
+    - _GlowRadius: 0.808
+    - _PulseSpeed: 2.85
+    - _PulseStrength: 0.11
+    - _RadialCount: 2.97
+    - _RadialIntensity: 1.26
+    - _RadialSpeed: 2.14
+    - _RainbowIntensity: 0.959
+    - _RainbowSaturation: 1
+    - _RainbowSpeed: 1.84
+    - _SparkleDensity: 12
+    - _SparkleIntensity: 1
+    - _SparkleSpeed: 6.17
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

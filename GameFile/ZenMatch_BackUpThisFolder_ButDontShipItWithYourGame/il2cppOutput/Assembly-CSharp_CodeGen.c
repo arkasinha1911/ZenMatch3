@@ -173,6 +173,8 @@ extern void U3CU3Ec_U3CStartU3Eb__13_4_mCEAE60EDB7657E59024B6A8652569F11A2A662B5
 extern void PowerUpColorCycler_Awake_m3027E8A314E3C9A417F459C28B9F94E4AE685150 (void);
 extern void PowerUpColorCycler_Update_m5588940D85280D4B1C20C9C4EB9B4F07ABA077C1 (void);
 extern void PowerUpColorCycler__ctor_m661832B2666F394521E29E541765E60EEB2F2E3B (void);
+extern void PowerUpShaderApplier_Awake_mA302E2E0A208CB05B53940A25DCDA430F389EFE2 (void);
+extern void PowerUpShaderApplier__ctor_mD24D7742EDD4FA8FF235AF64C25E5414FFE35197 (void);
 extern void ProgressionManager_get_Instance_m6251B2B49CB8F51942513934973570B1DC76B582 (void);
 extern void ProgressionManager_set_Instance_m25A7364637F15C7AA36C4FCE13E2E7A7AFDF19F1 (void);
 extern void ProgressionManager_get_currentLives_mD838DD56718457AAFC95A6C0A5BC02A5AD214F1B (void);
@@ -474,7 +476,7 @@ extern void U3CWarpTextU3Ed__8_MoveNext_mCE7A826C5E4854C2C509C77BD18F5A9B6D691B0
 extern void U3CWarpTextU3Ed__8_System_Collections_Generic_IEnumeratorU3CSystem_ObjectU3E_get_Current_mD80368E9B7E259311C03E406B75161ED6F7618E3 (void);
 extern void U3CWarpTextU3Ed__8_System_Collections_IEnumerator_Reset_m07746C332D2D8CE5DEA59873C26F2FAD4B369B42 (void);
 extern void U3CWarpTextU3Ed__8_System_Collections_IEnumerator_get_Current_m71D7F84D9DEF63BEC6B44866515DDCF35B142A19 (void);
-static Il2CppMethodPointer s_methodPointers[467] = 
+static Il2CppMethodPointer s_methodPointers[469] = 
 {
 	AudioManager_get_Instance_mE470515848AEDD204D9C8CF0F50D6A9785890211,
 	AudioManager_set_Instance_m6F8BEEDBDA8BADCA733A3B1B697331DCCE5CE33D,
@@ -642,6 +644,8 @@ static Il2CppMethodPointer s_methodPointers[467] =
 	PowerUpColorCycler_Awake_m3027E8A314E3C9A417F459C28B9F94E4AE685150,
 	PowerUpColorCycler_Update_m5588940D85280D4B1C20C9C4EB9B4F07ABA077C1,
 	PowerUpColorCycler__ctor_m661832B2666F394521E29E541765E60EEB2F2E3B,
+	PowerUpShaderApplier_Awake_mA302E2E0A208CB05B53940A25DCDA430F389EFE2,
+	PowerUpShaderApplier__ctor_mD24D7742EDD4FA8FF235AF64C25E5414FFE35197,
 	ProgressionManager_get_Instance_m6251B2B49CB8F51942513934973570B1DC76B582,
 	ProgressionManager_set_Instance_m25A7364637F15C7AA36C4FCE13E2E7A7AFDF19F1,
 	ProgressionManager_get_currentLives_mD838DD56718457AAFC95A6C0A5BC02A5AD214F1B,
@@ -944,7 +948,7 @@ static Il2CppMethodPointer s_methodPointers[467] =
 	U3CWarpTextU3Ed__8_System_Collections_IEnumerator_Reset_m07746C332D2D8CE5DEA59873C26F2FAD4B369B42,
 	U3CWarpTextU3Ed__8_System_Collections_IEnumerator_get_Current_m71D7F84D9DEF63BEC6B44866515DDCF35B142A19,
 };
-static const int32_t s_InvokerIndices[467] = 
+static const int32_t s_InvokerIndices[469] = 
 {
 	27235,
 	26026,
@@ -1107,6 +1111,8 @@ static const int32_t s_InvokerIndices[467] =
 	15580,
 	15580,
 	27335,
+	15580,
+	15580,
 	15580,
 	15580,
 	15580,
@@ -1418,7 +1424,7 @@ IL2CPP_EXTERN_C const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule;
 const Il2CppCodeGenModule g_AssemblyU2DCSharp_CodeGenModule = 
 {
 	"Assembly-CSharp.dll",
-	467,
+	469,
 	s_methodPointers,
 	0,
 	NULL,

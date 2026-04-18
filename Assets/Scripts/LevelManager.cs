@@ -421,7 +421,16 @@ public class LevelManager : MonoBehaviour
             if (currentMoves >= maxMoves * 0.5f) earnedStars = 3;
             else if (currentMoves >= maxMoves * 0.25f) earnedStars = 2;
             
-            ProgressionManager.Instance.AddStars(earnedStars);
+            // Only award NEW stars the player hasn't already earned on this level.
+            // Example: If they previously got 2 stars and now earned 3, they only receive 1 new star.
+            // If they already had 3 stars, they receive 0 additional stars (no farming!).
+            int previousBest = ProgressionManager.Instance.GetLevelStars(ProgressionManager.Instance.currentPlayingLevel);
+            int newStarsToAdd = Mathf.Max(0, earnedStars - previousBest);
+            
+            if (newStarsToAdd > 0)
+            {
+                ProgressionManager.Instance.AddStars(newStarsToAdd);
+            }
             ProgressionManager.Instance.SaveLevelStars(ProgressionManager.Instance.currentPlayingLevel, earnedStars);
 
             // Update UI with Stars earned (visual star icons)
