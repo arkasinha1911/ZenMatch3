@@ -117,15 +117,15 @@ public class LevelSelectUI : MonoBehaviour
                     buttonComponent.style.opacity = 0.4f;
                 }
                 
-                if (currentLevelToSetup % 10 == 0)
+                if (currentLevelToSetup % 15 == 0)
                 {
                     // Challenge Level! Gold button
                     buttonComponent.style.backgroundColor = new StyleColor(new Color(0.9f, 0.7f, 0f));
                 }
                 else
                 {
-                    // Shift background color hue based on the group (every 10 levels)
-                    int groupIndex = (currentLevelToSetup - 1) / 10;
+                    // Shift background color hue based on the group (every 15 levels)
+                    int groupIndex = (currentLevelToSetup - 1) / 15;
                     float hue = (groupIndex * 0.15f) % 1f; // Shift hue by 15% per group
                     buttonComponent.style.backgroundColor = new StyleColor(Color.HSVToRGB(hue, 0.6f, 0.8f));
                 }

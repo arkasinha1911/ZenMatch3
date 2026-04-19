@@ -14,6 +14,11 @@ public class MainMenuManager : MonoBehaviour
     public LevelManager levelManager;
     public LevelSelectUI levelSelectUI; // Reference to refresh the level buttons when the panel opens!
 
+    [Header("Power Up Icons")]
+    public Sprite magnetIcon;
+    public Sprite xBombIcon;
+    public Sprite areaBombIcon;
+
     private VisualElement mainMenuPanel;
     private VisualElement levelSelectPanel;
     private VisualElement settingsPanel;
@@ -24,10 +29,14 @@ public class MainMenuManager : MonoBehaviour
     private Label lblShopAreaBombOwned;
     private Label lblShopFeedback;
 
-    // Lives display elements
-    private Label livesDisplayLabel;
+    [Header("Lives Display Sprites")]
+    public Sprite fullLifeIcon;
+    public Sprite lostLifeIcon;
+
+    private VisualElement[] lifeIcons;
     private Label livesTimerLabel;
     private VisualElement livesContainer;
+    private Label gameTitleLabel;
 
     private void Start()
     {
@@ -39,6 +48,7 @@ public class MainMenuManager : MonoBehaviour
         levelSelectPanel = root.Q<VisualElement>("levelSelectPanel");
         settingsPanel = root.Q<VisualElement>("settingsPanel");
         gameHUDPanel = root.Q<VisualElement>("gameHUDPanel");
+        gameTitleLabel = root.Q<Label>("gameTitleLabel");
 
         // Buttons
         Button playButton = root.Q<Button>("playButton");
@@ -47,6 +57,9 @@ public class MainMenuManager : MonoBehaviour
         Button closeSettingsButton = root.Q<Button>("closeSettingsButton");
         Button exitButton = root.Q<Button>("exitButton");
         Button resetLivesButton = root.Q<Button>("resetLivesButton");
+        Button watchAdForLifeButton = root.Q<Button>("watchAdForLifeButton");
+        Button resetPowerupsButton = root.Q<Button>("resetPowerupsButton");
+        Button unlockAllLevelsButton = root.Q<Button>("unlockAllLevelsButton");
 
         // Shop UI
         lblTotalStars = root.Q<Label>("lblTotalStars");
@@ -57,6 +70,49 @@ public class MainMenuManager : MonoBehaviour
         Button buyMagnetButton = root.Q<Button>("buyMagnetButton");
         Button buyXBombButton = root.Q<Button>("buyXBombButton");
         Button buyAreaBombButton = root.Q<Button>("buyAreaBombButton");
+
+        // Swap out shop emojis with Sprites if provided
+        if (settingsPanel != null)
+        {
+            var magnetCard = settingsPanel.Q<VisualElement>(className: "shop-card-magnet");
+            if (magnetCard != null && magnetIcon != null)
+            {
+                var iconLbl = magnetCard.Q<Label>(className: "shop-card-icon");
+                if (iconLbl != null) {
+                    iconLbl.text = "";
+                    iconLbl.style.backgroundImage = new StyleBackground(magnetIcon);
+                    iconLbl.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+                    iconLbl.style.width = 60; // Better proportion for a sprite
+                    iconLbl.style.height = 60;
+                }
+            }
+
+            var xBombCard = settingsPanel.Q<VisualElement>(className: "shop-card-xbomb");
+            if (xBombCard != null && xBombIcon != null)
+            {
+                var iconLbl = xBombCard.Q<Label>(className: "shop-card-icon");
+                if (iconLbl != null) {
+                    iconLbl.text = "";
+                    iconLbl.style.backgroundImage = new StyleBackground(xBombIcon);
+                    iconLbl.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+                    iconLbl.style.width = 60;
+                    iconLbl.style.height = 60;
+                }
+            }
+
+            var areaBombCard = settingsPanel.Q<VisualElement>(className: "shop-card-areabomb");
+            if (areaBombCard != null && areaBombIcon != null)
+            {
+                var iconLbl = areaBombCard.Q<Label>(className: "shop-card-icon");
+                if (iconLbl != null) {
+                    iconLbl.text = "";
+                    iconLbl.style.backgroundImage = new StyleBackground(areaBombIcon);
+                    iconLbl.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+                    iconLbl.style.width = 60;
+                    iconLbl.style.height = 60;
+                }
+            }
+        }
 
         // Button Listeners
         if (playButton != null) playButton.clicked += ShowLevelSelect;
@@ -81,6 +137,54 @@ public class MainMenuManager : MonoBehaviour
                     {
                         if (levelSelectUI != null) levelSelectUI.GenerateLevelButtons();
                     }
+                }
+            };
+        }
+        
+        if (resetPowerupsButton != null)
+        {
+            resetPowerupsButton.clicked += () => 
+            {
+                if (ProgressionManager.Instance != null)
+                {
+                    ProgressionManager.Instance.ResetPowerups();
+                    UpdateShopUI();
+                    SetFeedback("Powerups Reset!", new Color(0.91f, 0.3f, 0.24f));
+                    Debug.Log("Powerups reset by Dev button");
+                }
+            };
+        }
+
+        if (unlockAllLevelsButton != null)
+        {
+            unlockAllLevelsButton.clicked += () => 
+            {
+                if (ProgressionManager.Instance != null)
+                {
+                    ProgressionManager.Instance.UnlockAllLevels(500); // Unlocks 500 levels
+                    if (levelSelectUI != null) levelSelectUI.GenerateLevelButtons(); // Refresh scroll view
+                    SetFeedback("All Levels Unlocked!", new Color(0.9f, 0.7f, 0.1f));
+                    Debug.Log("Levels unlocked by Dev button");
+                }
+            };
+        }
+        
+        if (watchAdForLifeButton != null)
+        {
+            watchAdForLifeButton.clicked += () =>
+            {
+                if (AdManager.Instance != null && ProgressionManager.Instance != null)
+                {
+                    // Disable button to prevent spam click
+                    watchAdForLifeButton.SetEnabled(false);
+                    AdManager.Instance.ShowRewardedAd((success) => 
+                    {
+                        if (success)
+                        {
+                            ProgressionManager.Instance.GiveOneLife();
+                        }
+                        watchAdForLifeButton.SetEnabled(true);
+                    });
                 }
             };
         }
@@ -124,51 +228,88 @@ public class MainMenuManager : MonoBehaviour
         livesContainer.style.flexDirection = FlexDirection.Column;
         livesContainer.pickingMode = PickingMode.Ignore;
 
-        livesDisplayLabel = new Label();
-        livesDisplayLabel.style.fontSize = 28;
-        livesDisplayLabel.style.color = Color.white;
-        livesDisplayLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        livesDisplayLabel.style.unityTextAlign = TextAnchor.MiddleRight;
-        livesDisplayLabel.style.textShadow = new TextShadow { offset = new Vector2(1, 1), blurRadius = 2, color = Color.black };
-        livesDisplayLabel.pickingMode = PickingMode.Ignore;
-        livesContainer.Add(livesDisplayLabel);
+        VisualElement rowContainer = new VisualElement();
+        rowContainer.style.flexDirection = FlexDirection.Row;
+        rowContainer.style.alignItems = Align.Center;
+        rowContainer.pickingMode = PickingMode.Ignore;
 
         livesTimerLabel = new Label();
-        livesTimerLabel.style.fontSize = 22;
+        livesTimerLabel.style.fontSize = 24;
         livesTimerLabel.style.color = new StyleColor(new Color(1f, 0.85f, 0.5f));
-        livesTimerLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+        livesTimerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
         livesTimerLabel.style.textShadow = new TextShadow { offset = new Vector2(1, 1), blurRadius = 2, color = Color.black };
+        livesTimerLabel.style.marginRight = 15;
+        livesTimerLabel.style.display = DisplayStyle.None; // Hidden by default
         livesTimerLabel.pickingMode = PickingMode.Ignore;
-        livesContainer.Add(livesTimerLabel);
+        rowContainer.Add(livesTimerLabel);
 
-        root.Add(livesContainer);
+        int max = ProgressionManager.MAX_LIVES;
+        lifeIcons = new VisualElement[max];
+        for (int i = 0; i < max; i++)
+        {
+            var icon = new VisualElement();
+            icon.style.width = 30;
+            icon.style.height = 30;
+            icon.style.marginLeft = 2;
+            icon.style.marginRight = 2;
+            icon.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+            rowContainer.Add(icon);
+            lifeIcons[i] = icon;
+        }
+        
+        livesContainer.Add(rowContainer);
+
+        Label oldLivesText = root.Q<Label>("livesText");
+        if (oldLivesText != null)
+        {
+            oldLivesText.style.display = DisplayStyle.None; // Hide original text
+            VisualElement parentPill = oldLivesText.parent;
+            parentPill.Add(livesContainer);
+            
+            livesContainer.style.position = StyleKeyword.Null; // Reset absolute positioning
+            livesContainer.style.top = StyleKeyword.Null;
+            livesContainer.style.right = StyleKeyword.Null;
+            livesContainer.style.alignItems = Align.Center; // Align inside the badge
+            livesContainer.style.marginTop = 5;
+        }
+        else
+        {
+            // Fallback backward compatibility layout
+            root.Add(livesContainer);
+        }
     }
 
     private void Update()
     {
+        // Animate title when Main Menu is active
+        if (gameTitleLabel != null && mainMenuPanel != null && mainMenuPanel.style.display == DisplayStyle.Flex)
+        {
+            float time = Time.time;
+            float scale = 1f + 0.05f * Mathf.Sin(time * 2f);
+            float rot = 3f * Mathf.Sin(time * 1.5f);
+            
+            gameTitleLabel.style.scale = new StyleScale(new Vector2(scale, scale));
+            gameTitleLabel.style.rotate = new StyleRotate(new Rotate(new Angle(rot, AngleUnit.Degree)));
+        }
+
         if (ProgressionManager.Instance == null) return;
 
         // Update lives display every frame
         int lives = ProgressionManager.Instance.currentLives;
         int max = ProgressionManager.MAX_LIVES;
 
-        if (livesDisplayLabel != null)
+        if (lifeIcons != null)
         {
-            // Build heart string: filled hearts for current lives, empty for missing
-            string hearts = "";
             for (int i = 0; i < max; i++)
             {
-                hearts += i < lives ? "\u2764 " : "\u2661 "; // ❤ vs ♡
+                if (i < lifeIcons.Length && lifeIcons[i] != null)
+                {
+                    if (i < lives && fullLifeIcon != null)
+                        lifeIcons[i].style.backgroundImage = new StyleBackground(fullLifeIcon);
+                    else if (i >= lives && lostLifeIcon != null)
+                        lifeIcons[i].style.backgroundImage = new StyleBackground(lostLifeIcon);
+                }
             }
-            livesDisplayLabel.text = hearts.Trim();
-
-            // Color changes based on urgency
-            if (lives == 0)
-                livesDisplayLabel.style.color = new StyleColor(new Color(1f, 0.3f, 0.3f));
-            else if (lives <= 2)
-                livesDisplayLabel.style.color = new StyleColor(new Color(1f, 0.7f, 0.4f));
-            else
-                livesDisplayLabel.style.color = new StyleColor(Color.white);
         }
 
         if (livesTimerLabel != null)

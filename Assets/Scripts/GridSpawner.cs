@@ -613,7 +613,8 @@ public class GridSpawner : MonoBehaviour
                 if (p != null) targets.Add(p);
             }
         }
-        StartCoroutine(ExecuteExternalPowerupCoroutine(targets));
+        Vector3 centerPos = GetWorldPosition(cx, cy);
+        StartCoroutine(ExecuteExternalPowerupCoroutine(targets, "AreaBomb", centerPos));
     }
 
     public void DetonateXBomb(int cx, int cy)
@@ -634,7 +635,8 @@ public class GridSpawner : MonoBehaviour
             GridPiece p3 = GetPieceAt(cx + i, cy - i); if (p3 != null && !targets.Contains(p3)) targets.Add(p3);
             GridPiece p4 = GetPieceAt(cx - i, cy - i); if (p4 != null && !targets.Contains(p4)) targets.Add(p4);
         }
-        StartCoroutine(ExecuteExternalPowerupCoroutine(targets));
+        Vector3 centerPos = GetWorldPosition(cx, cy);
+        StartCoroutine(ExecuteExternalPowerupCoroutine(targets, "XBomb", centerPos));
     }
 
     public void DetonateMagnet()
@@ -664,12 +666,58 @@ public class GridSpawner : MonoBehaviour
             }
         }
         
-        StartCoroutine(ExecuteExternalPowerupCoroutine(targets));
+        Vector3 centerPos = GetWorldPosition(columns / 2, rows / 2);
+        StartCoroutine(ExecuteExternalPowerupCoroutine(targets, "Magnet", centerPos));
     }
 
-    private IEnumerator ExecuteExternalPowerupCoroutine(List<GridPiece> toDestroy)
+    private IEnumerator ExecuteExternalPowerupCoroutine(List<GridPiece> toDestroy, string powerUpType = "", Vector3 spawnPos = default)
     {
         isProcessing = true;
+
+        if (!string.IsNullOrEmpty(powerUpType) && LevelManager.Instance != null)
+        {
+            Sprite icon = null;
+            if (powerUpType == "Magnet") icon = LevelManager.Instance.magnetIcon;
+            else if (powerUpType == "XBomb") icon = LevelManager.Instance.xBombIcon;
+            else if (powerUpType == "AreaBomb") icon = LevelManager.Instance.areaBombIcon;
+
+            if (icon != null)
+            {
+                GameObject animObj = new GameObject("PowerUpAnim_" + powerUpType);
+                animObj.transform.position = spawnPos;
+                animObj.transform.localScale = Vector3.zero;
+                SpriteRenderer sr = animObj.AddComponent<SpriteRenderer>();
+                sr.sprite = icon;
+                sr.sortingOrder = 999; // Ensure it renders on top of everything!
+
+                // 1. Swell up and pop into existence
+                float duration = 0.35f;
+                float elapsed = 0f;
+                while (elapsed < duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float progress = elapsed / duration;
+                    // Simple overshoot scale
+                    float scale = Mathf.Sin(progress * Mathf.PI * 0.5f) * 1.5f; 
+                    animObj.transform.localScale = new Vector3(scale, scale, 1f) * gridScaleMultiplier;
+                    yield return null;
+                }
+
+                // 2. Vibrate intensely before detonating
+                duration = 0.25f;
+                elapsed = 0f;
+                Vector3 basePos = animObj.transform.position;
+                while (elapsed < duration)
+                {
+                    elapsed += Time.deltaTime;
+                    animObj.transform.position = basePos + (Vector3)Random.insideUnitCircle * 0.15f;
+                    yield return null;
+                }
+
+                // 3. Boom!
+                Destroy(animObj);
+            }
+        }
 
         List<GridPiece> distinctToDestroy = new List<GridPiece>();
         foreach (var p in toDestroy)

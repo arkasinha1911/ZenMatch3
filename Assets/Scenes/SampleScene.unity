@@ -641,7 +641,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   backgroundMusicSource: {fileID: 1325886149}
   sfxSource: {fileID: 1325886148}
-  themeMusic: {fileID: 8300000, guid: 57e2bc7aa29731b418d6bc13e446c3be, type: 3}
+  themeMusic: {fileID: 8300000, guid: ae201c060c88bb6408e22ad9d1bac373, type: 3}
   swapClip: {fileID: 0}
   matchClip: {fileID: 8300000, guid: 9cb19eb032d304b07acec596ae2ce4a4, type: 3}
 --- !u!4 &1325886151
@@ -696,7 +696,7 @@ MonoBehaviour:
   centerGrid: 1
   spawnOnStart: 1
   usePerlinNoise: 1
-  noiseScale: 0.5
+  noiseScale: 1
   noiseThreshold: 0.195
   centerBlankBias: 0.141
   blankAreaPrefab: {fileID: 4654262940945227369, guid: bb3b3ff945ae21647876bdac0604b556, type: 3}
@@ -708,6 +708,9 @@ MonoBehaviour:
   - {fileID: 5497656661298373841, guid: 0d8509461bed2a24cb869e9b6aece9fa, type: 3}
   - {fileID: 1231800044163189978, guid: 9a594609e33188047a0578d6829c4ccc, type: 3}
   - {fileID: 9158550037390314558, guid: df882c9d91492444baa9fad99722552b, type: 3}
+  - {fileID: 6918301191766964783, guid: 07acf2068e9501c4c84bb5ecc42dabf9, type: 3}
+  - {fileID: 6462440633216583382, guid: 2a795b53b44934043b21e6ac7e6d723c, type: 3}
+  - {fileID: 2755081343472301793, guid: 4fe2d37ef39a771419a6e8bfc2f99c3b, type: 3}
   horizontalBombPrefab: {fileID: 1795233769168893115, guid: 4a62daa07e27076439967974010ab681, type: 3}
   verticalBombPrefab: {fileID: 5264185223600133828, guid: 2d22ee01370415e4d9156ac06b01b959, type: 3}
   colorBombPrefab: {fileID: 4134341284766266917, guid: 1de765262a2728147b63cd9e6e5e3002, type: 3}
@@ -785,6 +788,9 @@ MonoBehaviour:
     amountCollected: 0
   uiDocument: {fileID: 2103789380}
   targetUIAsset: {fileID: 9197481963319205126, guid: 57700814310d7214995f2979401f8e6b, type: 3}
+  magnetIcon: {fileID: 1535325516486818496, guid: 5985da70a4dfc064c92262bec621c8d1, type: 3}
+  xBombIcon: {fileID: 7369206648493144900, guid: b1b1c55a8b9d95f44b338ad7f970ea94, type: 3}
+  areaBombIcon: {fileID: -3548017759039531166, guid: c26547f49d3a8334d86aff526b96f8f7, type: 3}
   maxMoves: 20
   currentMoves: 0
 --- !u!4 &1850095745
@@ -912,6 +918,11 @@ MonoBehaviour:
   gridSpawner: {fileID: 1756772856}
   levelManager: {fileID: 1850095744}
   levelSelectUI: {fileID: 2103789378}
+  magnetIcon: {fileID: 1535325516486818496, guid: 5985da70a4dfc064c92262bec621c8d1, type: 3}
+  xBombIcon: {fileID: 7369206648493144900, guid: b1b1c55a8b9d95f44b338ad7f970ea94, type: 3}
+  areaBombIcon: {fileID: -3548017759039531166, guid: c26547f49d3a8334d86aff526b96f8f7, type: 3}
+  fullLifeIcon: {fileID: 4606908045521496030, guid: 67cade6d89fa2984e949864c084ab9fd, type: 3}
+  lostLifeIcon: {fileID: -166971343628228112, guid: 9eba4b668556c5644862c74a894f11d0, type: 3}
 --- !u!114 &2103789380
 MonoBehaviour:
   m_ObjectHideFlags: 0

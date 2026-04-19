@@ -41,7 +41,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ColorSteps: 10
+    - _ColorSteps: 5.73
     - _EnableExternalAlpha: 0
     - _OutlineWidth: 5
     - _ZWrite: 0

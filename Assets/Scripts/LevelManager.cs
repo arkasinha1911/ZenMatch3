@@ -28,6 +28,11 @@ public class LevelManager : MonoBehaviour
     public UIDocument uiDocument;
     public VisualTreeAsset targetUIAsset; // (ObjectiveTargetTemplate.uxml)
 
+    [Header("Power Up Icons")]
+    public Sprite magnetIcon;
+    public Sprite xBombIcon;
+    public Sprite areaBombIcon;
+
     private VisualElement gameWinPanel;
     private VisualElement gameOverPanel;
     private VisualElement gamePausePanel;
@@ -70,56 +75,63 @@ public class LevelManager : MonoBehaviour
         {
             int level = ProgressionManager.Instance.currentPlayingLevel;
             
+            bool isChallengeLevel = (level % 15 == 0);
+
             // DYNAMIC TARGET COUNT SCALING
-            // The number of distinct shapes to collect scales with level 
             int numTargetsToSpawn = 1;
-            if (level >= 31 && level <= 50) numTargetsToSpawn = 2;
-            else if (level >= 51 && level <= 70) numTargetsToSpawn = 3;
-            else if (level >= 71 && level <= 100) numTargetsToSpawn = 4;
-            else if (level > 100) numTargetsToSpawn = 5;
+            if (level >= 20 && level <= 40) numTargetsToSpawn = 2;
+            else if (level >= 41 && level <= 70) numTargetsToSpawn = 3;
+            else if (level >= 71 && level <= 120) numTargetsToSpawn = 4;
+            else if (level > 120) numTargetsToSpawn = 5;
+            
+            if (isChallengeLevel)
+            {
+                numTargetsToSpawn += 1;
+            }
+
             if (gridSpawner != null && gridSpawner.prefabsToSpawn != null)
             {
                 numTargetsToSpawn = Mathf.Min(numTargetsToSpawn, gridSpawner.prefabsToSpawn.Count);
             }
-            // Need to recreate the list fully
+
             targets = new List<LevelTarget>();
             for(int i = 0; i < numTargetsToSpawn; i++)
             {
                 targets.Add(new LevelTarget());
             }
 
-            bool isChallengeLevel = (level % 10 == 0);
-            
+            // DYNAMIC CASCADE MULTIPLIER: 
+            // A 9x9 grid (which kicks in around level 40) is massive and triggers huge cascade bloat.
+            // On a 5x5 board you clear ~3 pieces per move. On a 9x9 board you clear ~12 pieces per move!
+            float maxBoardBonus = Mathf.Min(level, 200) / 25f; // Up to +8 at level 200
+            float cascadeMultiplier = 3.5f + maxBoardBonus; 
+
             if (isChallengeLevel)
             {
-                // Challenge levels are stricter on moves! Minimum of 15.
-                maxMoves = Mathf.Max(15, 25 - (level / 15));
+                // Challenge levels drastically restrict moves
+                maxMoves = Mathf.Max(12, 25 - (level / 15));
                 
                 foreach (var target in targets)
                 {
-                    // Get base expected total blocks to clear, then verify it's mathematically possible!
-                    int totalExpected = 20 + (level * 2);
+                    // Challenge levels require significantly more total blocks cleared than standard levels
+                    int totalExpected = 30 + Mathf.FloorToInt(level * 3.5f);
                     
-                    // A very good player clears ~3.5 target blocks per move via cascades/bombs.
-                    // We hard-cap the required blocks so it never asks for more than is physically possible.
-                    totalExpected = Mathf.Min(totalExpected, (int)(maxMoves * 3.5f));
+                    // We cap the required blocks, but with a massively boosted multiplier so it doesn't arbitrarily bottom out at high levels!
+                    totalExpected = Mathf.Min(totalExpected, (int)(maxMoves * (cascadeMultiplier + 2.0f)));
                     
-                    target.amountRequired = Mathf.Max(10, totalExpected / numTargetsToSpawn);
+                    target.amountRequired = Mathf.Max(15, totalExpected / numTargetsToSpawn);
                 }
             }
             else
             {
-                // Standard progression: Minimum of 25 moves
-                maxMoves = Mathf.Max(25, 35 - (level / 10));
+                // Standard progression bottoms out at 20 moves, not 25.
+                maxMoves = Mathf.Max(20, 35 - (level / 10));
                 
                 foreach (var target in targets)
                 {
-                    // Slow steady scaling
-                    int totalExpected = 15 + level;
+                    int totalExpected = 15 + Mathf.FloorToInt(level * 1.5f);
                     
-                    // A standard player clears ~2.5 blocks of their target per move.
-                    // Hard cap to prevent impossible requirements at high levels!
-                    totalExpected = Mathf.Min(totalExpected, (int)(maxMoves * 2.5f));
+                    totalExpected = Mathf.Min(totalExpected, (int)(maxMoves * cascadeMultiplier));
                     
                     target.amountRequired = Mathf.Max(5, totalExpected / numTargetsToSpawn);
                 }
@@ -144,11 +156,17 @@ public class LevelManager : MonoBehaviour
             movesText = root.Q<Label>("movesText");
             livesText = root.Q<Label>("livesText");
             
+            if (livesText != null) 
+            {
+                livesText.enableRichText = true;
+            }
+            
             // Wire buttons if present
             Button nextLevelButton = root.Q<Button>("nextLevelButton");
             Button winMenuButton = root.Q<Button>("winMenuButton");
             Button retryButton = root.Q<Button>("retryButton");
             Button loseMenuButton = root.Q<Button>("loseMenuButton");
+            Button watchAdForMovesButton = root.Q<Button>("watchAdForMovesButton");
             
             // HUD and Pause Buttons
             Button hudBackButton = root.Q<Button>("hudBackButton");
@@ -164,6 +182,36 @@ public class LevelManager : MonoBehaviour
             if (loseMenuButton != null) loseMenuButton.clicked += ReturnToMenu;
             if (hudBackButton != null) hudBackButton.clicked += ReturnToMenu;
             if (pauseMenuButton != null) pauseMenuButton.clicked += ReturnToMenu;
+            
+            if (watchAdForMovesButton != null)
+            {
+                watchAdForMovesButton.clicked += () => 
+                {
+                    if (AdManager.Instance != null)
+                    {
+                        watchAdForMovesButton.SetEnabled(false);
+                        AdManager.Instance.ShowRewardedAd((success) => 
+                        {
+                            if (success)
+                            {
+                                // Give player 5 extra moves and resume!
+                                currentMoves += 5;
+                                if (gameOverPanel != null) gameOverPanel.style.display = DisplayStyle.None;
+                                IsGameActive = true;
+                                IsPaused = false;
+                                Time.timeScale = 1f;
+                                
+                                // Recover the life we subtracted when they triggered Game Over
+                                if (ProgressionManager.Instance != null)
+                                {
+                                    ProgressionManager.Instance.GiveOneLife();
+                                }
+                            }
+                            watchAdForMovesButton.SetEnabled(true);
+                        });
+                    }
+                };
+            }
 
             // Pause mechanics
             if (hudPauseButton != null) hudPauseButton.clicked += PauseGame;
@@ -178,6 +226,22 @@ public class LevelManager : MonoBehaviour
             btnMagnet = root.Q<Button>("btnMagnet");
             btnXBomb = root.Q<Button>("btnXBomb");
             btnAreaBomb = root.Q<Button>("btnAreaBomb");
+
+            if (btnMagnet != null && magnetIcon != null)
+            {
+                btnMagnet.text = "";
+                btnMagnet.style.backgroundImage = new StyleBackground(magnetIcon);
+            }
+            if (btnXBomb != null && xBombIcon != null)
+            {
+                btnXBomb.text = "";
+                btnXBomb.style.backgroundImage = new StyleBackground(xBombIcon);
+            }
+            if (btnAreaBomb != null && areaBombIcon != null)
+            {
+                btnAreaBomb.text = "";
+                btnAreaBomb.style.backgroundImage = new StyleBackground(areaBombIcon);
+            }
 
             lblMagnetCount = root.Q<Label>("lblMagnetCount");
             lblXBombCount = root.Q<Label>("lblXBombCount");
@@ -341,10 +405,21 @@ public class LevelManager : MonoBehaviour
             movesText.text = $"Moves: {currentMoves}";
         }
 
-        if (livesText != null && ProgressionManager.Instance != null)
-        {
-            livesText.text = $"Lives: {ProgressionManager.Instance.currentLives}/{ProgressionManager.MAX_LIVES}";
-        }
+        // Removed: graphical hearts are now generated directly into the HUD by MainMenuManager.
+        // if (livesText != null && ProgressionManager.Instance != null)
+        // {
+        //     int lives = ProgressionManager.Instance.currentLives;
+        //     int max = ProgressionManager.MAX_LIVES;
+        //     string hearts = "";
+        //     for (int i = 0; i < max; i++)
+        //     {
+        //         if (i < lives) 
+        //             hearts += "<color=#FF3B3B>\u2764</color>";
+        //         else 
+        //             hearts += "<color=#808080>\u2764</color>";
+        //     }
+        //     livesText.text = hearts;
+        // }
 
         if (scoreText != null && ScoreManager.Instance != null)
         {

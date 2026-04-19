@@ -91,9 +91,25 @@ public class ProgressionManager : MonoBehaviour
 
         // Load Shop & Currency
         TotalStars = PlayerPrefs.GetInt(STARS_KEY, 0);
-        MagnetCount = PlayerPrefs.GetInt(MAGNET_KEY, 0);
-        XBombCount = PlayerPrefs.GetInt(XBOMB_KEY, 0);
-        AreaBombCount = PlayerPrefs.GetInt(AREABOMB_KEY, 0);
+
+        if (PlayerPrefs.GetInt("ReceivedStarterPack", 0) == 0)
+        {
+            MagnetCount = PlayerPrefs.GetInt(MAGNET_KEY, 0) + 2;
+            XBombCount = PlayerPrefs.GetInt(XBOMB_KEY, 0) + 2;
+            AreaBombCount = PlayerPrefs.GetInt(AREABOMB_KEY, 0) + 2;
+            
+            PlayerPrefs.SetInt(MAGNET_KEY, MagnetCount);
+            PlayerPrefs.SetInt(XBOMB_KEY, XBombCount);
+            PlayerPrefs.SetInt(AREABOMB_KEY, AreaBombCount);
+            PlayerPrefs.SetInt("ReceivedStarterPack", 1);
+            PlayerPrefs.Save();
+        }
+        else
+        {
+            MagnetCount = PlayerPrefs.GetInt(MAGNET_KEY, 0);
+            XBombCount = PlayerPrefs.GetInt(XBOMB_KEY, 0);
+            AreaBombCount = PlayerPrefs.GetInt(AREABOMB_KEY, 0);
+        }
 
         // Regenerate any lives that accumulated while the game was closed!
         RegenerateOfflineLives();
@@ -102,99 +118,125 @@ public class ProgressionManager : MonoBehaviour
         currentPlayingLevel = highestUnlockedLevel; 
     }
 
+    private float activeRegenTimer = 0f;
+    private int suspendTickCount = 0;
+
     /// <summary>
-    /// Checks how much real time has passed since lives dropped below max,
-    /// and grants 1 life per 30 minutes that elapsed (even while the app was closed).
+    /// Checks how much real time has passed since lives dropped below max.
+    /// We use Environment.TickCount to track device uptime, which CANNOT be spoofed 
+    /// by changing the device clock!
     /// </summary>
     private void RegenerateOfflineLives()
     {
-        if (currentLives >= MAX_LIVES) return; // Already full, nothing to regenerate.
+        if (currentLives >= MAX_LIVES) return; 
 
-        string savedTimestamp = PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "");
-        if (string.IsNullOrEmpty(savedTimestamp)) return; // No timestamp saved, skip.
+        activeRegenTimer = PlayerPrefs.GetFloat("ActiveRegenTimer", LIFE_REGEN_SECONDS);
 
-        DateTime lastLossTime;
-        if (!DateTime.TryParse(savedTimestamp, out lastLossTime)) return; // Corrupted timestamp, skip.
+        // Check if we saved a TickCount from a previous session
+        int lastSavedTick = PlayerPrefs.GetInt("LastTickCount", Environment.TickCount);
+        int currentTick = Environment.TickCount;
 
-        double secondsElapsed = (DateTime.UtcNow - lastLossTime).TotalSeconds;
-        int livesToAdd = (int)(secondsElapsed / LIFE_REGEN_SECONDS);
-
-        if (livesToAdd > 0)
+        // Calculate ticks passed. If the device was rebooted, currentTick will be smaller than lastSavedTick.
+        // In that case, we cannot safely calculate time passed without internet, so we grant 0 offline time to prevent device clock spoofing.
+        if (currentTick >= lastSavedTick)
         {
-            currentLives = Mathf.Min(currentLives + livesToAdd, MAX_LIVES);
-            PlayerPrefs.SetInt(LIVES_KEY, currentLives);
-
-            if (currentLives >= MAX_LIVES)
-            {
-                // Fully regenerated! Clear the timestamp.
-                PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY);
-            }
-            else
-            {
-                // Still not full — advance the saved timestamp by however many lives were granted
-                // so the "remainder" time carries forward correctly.
-                DateTime advancedTime = lastLossTime.AddSeconds(livesToAdd * LIFE_REGEN_SECONDS);
-                PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, advancedTime.ToString("o"));
-            }
-            PlayerPrefs.Save();
+            float secondsPassed = (currentTick - lastSavedTick) / 1000f;
+            ProcessPassedSeconds(secondsPassed);
+        }
+        else
+        {
+            // Device was rebooted. We ignore offline time to satisfy the strict anti-cheat requirement offline.
         }
     }
 
+    private void ProcessPassedSeconds(float secondsPassed)
+    {
+        while (secondsPassed > 0 && currentLives < MAX_LIVES)
+        {
+            if (secondsPassed >= activeRegenTimer)
+            {
+                secondsPassed -= activeRegenTimer;
+                currentLives++;
+                PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+                activeRegenTimer = LIFE_REGEN_SECONDS;
+            }
+            else
+            {
+                activeRegenTimer -= secondsPassed;
+                secondsPassed = 0;
+            }
+        }
+        
+        if (currentLives >= MAX_LIVES)
+            activeRegenTimer = 0;
+
+        PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
+        PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
+        PlayerPrefs.Save();
+    }
+
+    private void OnApplicationPause(bool isPaused)
+    {
+        if (isPaused)
+        {
+            suspendTickCount = Environment.TickCount;
+            PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
+            PlayerPrefs.SetInt("LastTickCount", suspendTickCount);
+            PlayerPrefs.Save();
+        }
+        else
+        {
+            if (suspendTickCount != 0)
+            {
+                int currentTick = Environment.TickCount;
+                if (currentTick >= suspendTickCount)
+                {
+                    float secondsPassed = (currentTick - suspendTickCount) / 1000f;
+                    ProcessPassedSeconds(secondsPassed);
+                }
+            }
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
+        PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
+        PlayerPrefs.Save();
+    }
+
     /// <summary>
-    /// Called every frame by the UI to tick the live regeneration timer in real-time.
-    /// Grants 1 life when the timer reaches 0 and restarts the cycle.
+    /// Ticks exclusively using unscaledDeltaTime to ignore the device's main clock entirely.
     /// </summary>
     private void Update()
     {
         if (currentLives < MAX_LIVES)
         {
-            string savedTimestamp = PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "");
-            if (!string.IsNullOrEmpty(savedTimestamp))
+            activeRegenTimer -= Time.unscaledDeltaTime;
+            if (activeRegenTimer <= 0)
             {
-                DateTime lastLossTime;
-                if (DateTime.TryParse(savedTimestamp, out lastLossTime))
-                {
-                    double secondsElapsed = (DateTime.UtcNow - lastLossTime).TotalSeconds;
-                    if (secondsElapsed >= LIFE_REGEN_SECONDS)
-                    {
-                        // Grant a life in real-time!
-                        currentLives = Mathf.Min(currentLives + 1, MAX_LIVES);
-                        PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+                currentLives++;
+                PlayerPrefs.SetInt(LIVES_KEY, currentLives);
 
-                        if (currentLives >= MAX_LIVES)
-                        {
-                            PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY);
-                        }
-                        else
-                        {
-                            // Advance timestamp for the next cycle
-                            DateTime advancedTime = lastLossTime.AddSeconds(LIFE_REGEN_SECONDS);
-                            PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, advancedTime.ToString("o"));
-                        }
-                        PlayerPrefs.Save();
-                    }
-                }
+                if (currentLives >= MAX_LIVES)
+                    activeRegenTimer = 0;
+                else
+                    activeRegenTimer += LIFE_REGEN_SECONDS;
+
+                PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
+                PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
+                PlayerPrefs.Save();
             }
         }
     }
 
     /// <summary>
     /// Returns the number of seconds remaining until the next life regenerates.
-    /// Returns 0 if lives are already full.
     /// </summary>
     public int GetSecondsUntilNextLife()
     {
         if (currentLives >= MAX_LIVES) return 0;
-
-        string savedTimestamp = PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "");
-        if (string.IsNullOrEmpty(savedTimestamp)) return LIFE_REGEN_SECONDS;
-
-        DateTime lastLossTime;
-        if (!DateTime.TryParse(savedTimestamp, out lastLossTime)) return LIFE_REGEN_SECONDS;
-
-        double secondsElapsed = (DateTime.UtcNow - lastLossTime).TotalSeconds;
-        int remaining = LIFE_REGEN_SECONDS - (int)secondsElapsed;
-        return Mathf.Max(0, remaining);
+        return Mathf.Max(0, (int)activeRegenTimer);
     }
 
     /// <summary>
@@ -207,29 +249,45 @@ public class ProgressionManager : MonoBehaviour
         if (currentLives < 0) currentLives = 0;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
 
-        // If this is the first life lost from a full tank, stamp the current UTC time.
-        // This starts the regeneration countdown clock.
         if (wasFullBefore && currentLives < MAX_LIVES)
         {
-            PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, DateTime.UtcNow.ToString("o"));
-        }
-        // If there was no timestamp yet (edge case), set one now
-        else if (string.IsNullOrEmpty(PlayerPrefs.GetString(LIVES_TIMESTAMP_KEY, "")))
-        {
-            PlayerPrefs.SetString(LIVES_TIMESTAMP_KEY, DateTime.UtcNow.ToString("o"));
+            activeRegenTimer = LIFE_REGEN_SECONDS;
+            PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
+            PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
         }
 
         PlayerPrefs.Save();
     }
 
     /// <summary>
-    /// Call this to refill the player's lives back to max (e.g. for testing or waiting).
+    /// Call this to refill the player's lives back to max.
     /// </summary>
     public void RefillLives()
     {
         currentLives = MAX_LIVES;
+        activeRegenTimer = 0;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
-        PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY); // Clear regen timer since we're full
+        PlayerPrefs.SetFloat("ActiveRegenTimer", 0);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Grants exactly 1 extra life (up to the maximum) to the player.
+    /// Usually granted after watching a Rewarded Ad.
+    /// </summary>
+    public void GiveOneLife()
+    {
+        if (currentLives >= MAX_LIVES) return;
+        
+        currentLives++;
+        PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+        
+        // If we just filled up the lives, clear the timestamp so regeneration pauses
+        if (currentLives >= MAX_LIVES)
+        {
+            PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY);
+        }
+        
         PlayerPrefs.Save();
     }
 
@@ -325,6 +383,26 @@ public class ProgressionManager : MonoBehaviour
         if (itemType == "Magnet" && MagnetCount > 0) { MagnetCount--; PlayerPrefs.SetInt(MAGNET_KEY, MagnetCount); }
         else if (itemType == "XBomb" && XBombCount > 0) { XBombCount--; PlayerPrefs.SetInt(XBOMB_KEY, XBombCount); }
         else if (itemType == "AreaBomb" && AreaBombCount > 0) { AreaBombCount--; PlayerPrefs.SetInt(AREABOMB_KEY, AreaBombCount); }
+        PlayerPrefs.Save();
+    }
+
+    public void ResetPowerups()
+    {
+        MagnetCount = 2;
+        XBombCount = 2;
+        AreaBombCount = 2;
+        
+        PlayerPrefs.SetInt(MAGNET_KEY, MagnetCount);
+        PlayerPrefs.SetInt(XBOMB_KEY, XBombCount);
+        PlayerPrefs.SetInt(AREABOMB_KEY, AreaBombCount);
+        PlayerPrefs.SetInt("ReceivedStarterPack", 1);
+        PlayerPrefs.Save();
+    }
+
+    public void UnlockAllLevels(int maxLevels = 500)
+    {
+        highestUnlockedLevel = maxLevels;
+        PlayerPrefs.SetInt(UNLOCKED_LEVEL_KEY, maxLevels);
         PlayerPrefs.Save();
     }
 
