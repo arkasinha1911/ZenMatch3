@@ -19,7 +19,7 @@ public class LevelManager : MonoBehaviour
     public static LevelManager Instance { get; private set; }
 
     [Header("Level State")]
-    public float countdownTimer = 60f;
+
     public bool randomizeTargets = true;
     public GridSpawner gridSpawner;
     public List<LevelTarget> targets;
@@ -36,10 +36,8 @@ public class LevelManager : MonoBehaviour
     private VisualElement gameWinPanel;
     private VisualElement gameOverPanel;
     private VisualElement gamePausePanel;
-    private Label timerText;
     private Label scoreText;
     private Label movesText;
-    private Label livesText;
 
     public int maxMoves = 20;
     public int currentMoves;
@@ -151,15 +149,8 @@ public class LevelManager : MonoBehaviour
             gameWinPanel = root.Q<VisualElement>("gameWinPanel");
             gameOverPanel = root.Q<VisualElement>("gameOverPanel");
             gamePausePanel = root.Q<VisualElement>("gamePausePanel");
-            timerText = root.Q<Label>("timerText");
             scoreText = root.Q<Label>("scoreText");
             movesText = root.Q<Label>("movesText");
-            livesText = root.Q<Label>("livesText");
-            
-            if (livesText != null) 
-            {
-                livesText.enableRichText = true;
-            }
             
             // Wire buttons if present
             Button nextLevelButton = root.Q<Button>("nextLevelButton");
@@ -386,40 +377,10 @@ public class LevelManager : MonoBehaviour
     {
         if (!IsGameActive || IsPaused) return;
 
-        // --- PAUSED TIMER LOGIC ---
-        // countdownTimer -= Time.deltaTime;
-        // if (countdownTimer <= 0f)
-        // {
-        //     countdownTimer = 0f;
-        //     TriggerGameOver();
-        // }
-
-        if (timerText != null)
-        {
-            // timerText.text = $"Time: {Mathf.CeilToInt(countdownTimer)}s";
-            timerText.style.display = DisplayStyle.None; // Hide timer
-        }
-
         if (movesText != null)
         {
             movesText.text = $"Moves: {currentMoves}";
         }
-
-        // Removed: graphical hearts are now generated directly into the HUD by MainMenuManager.
-        // if (livesText != null && ProgressionManager.Instance != null)
-        // {
-        //     int lives = ProgressionManager.Instance.currentLives;
-        //     int max = ProgressionManager.MAX_LIVES;
-        //     string hearts = "";
-        //     for (int i = 0; i < max; i++)
-        //     {
-        //         if (i < lives) 
-        //             hearts += "<color=#FF3B3B>\u2764</color>";
-        //         else 
-        //             hearts += "<color=#808080>\u2764</color>";
-        //     }
-        //     livesText.text = hearts;
-        // }
 
         if (scoreText != null && ScoreManager.Instance != null)
         {

@@ -10,12 +10,9 @@ public class AdManager : MonoBehaviour
 {
     public static AdManager Instance { get; private set; }
 
-    [Header("IronSource App Keys")]
-    public string androidAppKey = "YOUR_ANDROID_APP_KEY";
-    public string iosAppKey = "YOUR_IOS_APP_KEY";
-    
-    [Header("Ad Unit IDs")]
-    public string rewardedAdUnitId = "YOUR_REWARDED_AD_UNIT_ID";
+    [Header("IronSource Settings")]
+    public string androidAppKey = "260ae7de5";
+    public string rewardedAdUnitId = "j8ftlz7n20bvqxud";
 
     private LevelPlayRewardedAd rewardedVideoAd;
     private Action<bool> currentAdCallback;
@@ -34,27 +31,16 @@ public class AdManager : MonoBehaviour
 
     private void Start()
     {
-        // Setup IronSource App Key based on platform
-        string appKey = "";
-#if UNITY_ANDROID
-        appKey = androidAppKey;
-#elif UNITY_IOS
-        appKey = iosAppKey;
-#else
-        appKey = "UNSUPPORTED_PLATFORM";
-#endif
+        if (string.IsNullOrEmpty(androidAppKey))
+        {
+            Debug.LogWarning("AdManager: App Key is empty. Ads will not initialize.");
+            return;
+        }
 
-        if (appKey != "UNSUPPORTED_PLATFORM" && !string.IsNullOrEmpty(appKey) && !appKey.Contains("YOUR_"))
-        {
-            Debug.Log("AdManager: Initializing IronSource SDK...");
-            LevelPlay.OnInitSuccess += SdkInitializationCompletedEvent;
-            LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
-            LevelPlay.Init(appKey);
-        }
-        else
-        {
-            Debug.LogWarning("AdManager: IronSource App Key isn't set. Ads will fail to load or initialize.");
-        }
+        Debug.Log("AdManager: Initializing IronSource SDK...");
+        LevelPlay.OnInitSuccess += SdkInitializationCompletedEvent;
+        LevelPlay.OnInitFailed += SdkInitializationFailedEvent;
+        LevelPlay.Init(androidAppKey);
     }
 
     void SdkInitializationCompletedEvent(LevelPlayConfiguration config)

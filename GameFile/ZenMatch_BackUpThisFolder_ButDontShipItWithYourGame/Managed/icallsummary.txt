@@ -1089,11 +1089,8 @@ UnityEngine.PlayerConnectionInternal::SendMessage_Injected
 UnityEngine.PlayerConnectionInternal::UnregisterInternal_Injected
 UnityEngine.PlayerPrefs::TrySetFloat_Injected
 UnityEngine.PlayerPrefs::TrySetInt_Injected
-UnityEngine.PlayerPrefs::TrySetSetString_Injected
 UnityEngine.PlayerPrefs::GetInt_Injected
 UnityEngine.PlayerPrefs::GetFloat_Injected
-UnityEngine.PlayerPrefs::DeleteKey_Injected
-UnityEngine.PlayerPrefs::GetString_Injected
 UnityEngine.PlayerPrefs::Save
 UnityEngine.PolygonCollider2D::set_points_Injected
 UnityEngine.Profiling.Profiler::GetRuntimeMemorySizeLong_Injected
@@ -1121,6 +1118,7 @@ UnityEngine.Quaternion::Internal_ToEulerRad_Injected
 UnityEngine.Random::RandomRangeInt
 UnityEngine.Random::Range
 UnityEngine.Random::get_value
+UnityEngine.Random::GetRandomUnitCircle
 UnityEngine.Random::InitState
 UnityEngine.Random::get_state_Injected
 UnityEngine.Random::set_state_Injected

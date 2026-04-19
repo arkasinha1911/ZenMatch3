@@ -952,7 +952,7 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool NativeInputSystem_get_useImplicitMouseEv
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif
-// Method Definition Index: 3243
+// Method Definition Index: 3240
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void* IntPtr_ToPointer_m1A0612EED3A1C8B8850BE2943CFC42523064B4F6_inline (intptr_t* __this, const RuntimeMethod* method) 
 {
 	{

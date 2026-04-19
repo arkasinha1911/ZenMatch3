@@ -30,7 +30,7 @@ public class ProgressionManager : MonoBehaviour
     public int currentLives { get; private set; } = 6;
     
     private const string LIVES_KEY = "PlayerLives";
-    private const string LIVES_TIMESTAMP_KEY = "LivesTimestamp";
+
     
     /// <summary>
     /// How many real-world seconds between each life regeneration.
@@ -151,22 +151,19 @@ public class ProgressionManager : MonoBehaviour
 
     private void ProcessPassedSeconds(float secondsPassed)
     {
-        while (secondsPassed > 0 && currentLives < MAX_LIVES)
+        activeRegenTimer -= secondsPassed;
+        if (activeRegenTimer < 0) activeRegenTimer = 0;
+
+        // Calculate how many lives should still be missing based on remaining time
+        int livesStillMissing = Mathf.CeilToInt(activeRegenTimer / LIFE_REGEN_SECONDS);
+        int targetLives = MAX_LIVES - livesStillMissing;
+
+        if (targetLives > currentLives)
         {
-            if (secondsPassed >= activeRegenTimer)
-            {
-                secondsPassed -= activeRegenTimer;
-                currentLives++;
-                PlayerPrefs.SetInt(LIVES_KEY, currentLives);
-                activeRegenTimer = LIFE_REGEN_SECONDS;
-            }
-            else
-            {
-                activeRegenTimer -= secondsPassed;
-                secondsPassed = 0;
-            }
+            currentLives = Mathf.Min(targetLives, MAX_LIVES);
+            PlayerPrefs.SetInt(LIVES_KEY, currentLives);
         }
-        
+
         if (currentLives >= MAX_LIVES)
             activeRegenTimer = 0;
 
@@ -206,22 +203,27 @@ public class ProgressionManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Ticks exclusively using unscaledDeltaTime to ignore the device's main clock entirely.
+    /// Ticks the cumulative regen timer using unscaledDeltaTime.
+    /// Grants a life every time a 30-minute chunk completes.
     /// </summary>
     private void Update()
     {
         if (currentLives < MAX_LIVES)
         {
             activeRegenTimer -= Time.unscaledDeltaTime;
-            if (activeRegenTimer <= 0)
+            if (activeRegenTimer < 0) activeRegenTimer = 0;
+
+            // How many lives should still be missing based on remaining time
+            int livesStillMissing = Mathf.CeilToInt(activeRegenTimer / LIFE_REGEN_SECONDS);
+            int targetLives = MAX_LIVES - livesStillMissing;
+
+            if (targetLives > currentLives)
             {
-                currentLives++;
+                currentLives = Mathf.Min(targetLives, MAX_LIVES);
                 PlayerPrefs.SetInt(LIVES_KEY, currentLives);
 
                 if (currentLives >= MAX_LIVES)
                     activeRegenTimer = 0;
-                else
-                    activeRegenTimer += LIFE_REGEN_SECONDS;
 
                 PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
                 PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
@@ -231,16 +233,19 @@ public class ProgressionManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns the number of seconds remaining until the next life regenerates.
+    /// Returns seconds remaining until the NEXT single life regenerates.
     /// </summary>
     public int GetSecondsUntilNextLife()
     {
         if (currentLives >= MAX_LIVES) return 0;
-        return Mathf.Max(0, (int)activeRegenTimer);
+        int missingLives = MAX_LIVES - currentLives;
+        float nextLifeThreshold = (missingLives - 1) * LIFE_REGEN_SECONDS;
+        return Mathf.Max(0, (int)(activeRegenTimer - nextLifeThreshold));
     }
 
     /// <summary>
     /// Call this when the player fails a level.
+    /// Each lost life adds 30 minutes to the regeneration timer.
     /// </summary>
     public void LoseLife()
     {
@@ -249,13 +254,19 @@ public class ProgressionManager : MonoBehaviour
         if (currentLives < 0) currentLives = 0;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
 
-        if (wasFullBefore && currentLives < MAX_LIVES)
+        if (wasFullBefore)
         {
+            // First life lost — start a fresh 30-minute timer
             activeRegenTimer = LIFE_REGEN_SECONDS;
-            PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
-            PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
+        }
+        else
+        {
+            // Already regenerating — stack another 30 minutes on top
+            activeRegenTimer += LIFE_REGEN_SECONDS;
         }
 
+        PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
+        PlayerPrefs.SetInt("LastTickCount", Environment.TickCount);
         PlayerPrefs.Save();
     }
 
@@ -282,10 +293,9 @@ public class ProgressionManager : MonoBehaviour
         currentLives++;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
         
-        // If we just filled up the lives, clear the timestamp so regeneration pauses
         if (currentLives >= MAX_LIVES)
         {
-            PlayerPrefs.DeleteKey(LIVES_TIMESTAMP_KEY);
+            activeRegenTimer = 0;
         }
         
         PlayerPrefs.Save();
