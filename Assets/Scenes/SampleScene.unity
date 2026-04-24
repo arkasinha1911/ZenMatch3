@@ -119,6 +119,57 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &408301031
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 408301033}
+  - component: {fileID: 408301032}
+  m_Layer: 0
+  m_Name: MatchEffectsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &408301032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408301031}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18608c3eb4694f4b89e830771e89f76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MatchEffectsManager
+  match3ParticlePrefab: {fileID: 1429954232896169633, guid: 83036083a4ebcd34f98131bd3cf6f4d2, type: 3}
+  horizontalBombCreateParticle: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7, type: 3}
+  verticalBombCreateParticle: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7, type: 3}
+  shapeBombCreateParticle: {fileID: 1141330259687333427, guid: 6718dc24203da53468af9ada8fef7d6d, type: 3}
+  horizontalBombExplodeParticle: {fileID: 5880797563127281583, guid: 265d3a5ba69981a4698ceabcedf368b0, type: 3}
+  verticalBombExplodeParticle: {fileID: 5880797563127281583, guid: 265d3a5ba69981a4698ceabcedf368b0, type: 3}
+  shapeBombExplodeParticle: {fileID: 9157105887711914197, guid: c4f829cb7dd4b864caf8832ec5b1ee55, type: 3}
+--- !u!4 &408301033
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408301031}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -398,7 +449,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33248693a2788294ab8ac391acb6bba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
-  scoreText: {fileID: 0}
 --- !u!4 &938613898
 Transform:
   m_ObjectHideFlags: 0
@@ -406,6 +456,50 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 938613896}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &941140880
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 941140882}
+  - component: {fileID: 941140881}
+  m_Layer: 0
+  m_Name: PlayGamesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &941140881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941140880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d2757ecc151a07459ceb66dd4b7ed88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayGamesManager
+--- !u!4 &941140882
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941140880}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -710,7 +804,6 @@ MonoBehaviour:
   - {fileID: 9158550037390314558, guid: df882c9d91492444baa9fad99722552b, type: 3}
   - {fileID: 6918301191766964783, guid: 07acf2068e9501c4c84bb5ecc42dabf9, type: 3}
   - {fileID: 6462440633216583382, guid: 2a795b53b44934043b21e6ac7e6d723c, type: 3}
-  - {fileID: 2755081343472301793, guid: 4fe2d37ef39a771419a6e8bfc2f99c3b, type: 3}
   horizontalBombPrefab: {fileID: 1795233769168893115, guid: 4a62daa07e27076439967974010ab681, type: 3}
   verticalBombPrefab: {fileID: 5264185223600133828, guid: 2d22ee01370415e4d9156ac06b01b959, type: 3}
   colorBombPrefab: {fileID: 4134341284766266917, guid: 1de765262a2728147b63cd9e6e5e3002, type: 3}
@@ -773,7 +866,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9c8a9e20b8e9074ea591a6644995ca9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
-  countdownTimer: 360
   randomizeTargets: 1
   gridSpawner: {fileID: 1756772856}
   targets:
@@ -973,3 +1065,5 @@ SceneRoots:
   - {fileID: 1850095745}
   - {fileID: 1959085217}
   - {fileID: 2103789381}
+  - {fileID: 941140882}
+  - {fileID: 408301033}

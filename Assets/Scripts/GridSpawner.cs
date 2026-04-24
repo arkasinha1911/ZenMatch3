@@ -534,6 +534,18 @@ public class GridSpawner : MonoBehaviour
         toDestroy.AddRange(GetBombTargets(p1, p2.pieceType));
         toDestroy.AddRange(GetBombTargets(p2, p1.pieceType));
 
+        // Trigger specialized bomb explosion particles exactly where the bombs are!
+        if (MatchEffectsManager.Instance != null)
+        {
+            if (p1.powerUp == PowerUpType.HorizontalBomb) MatchEffectsManager.Instance.PlayHorizontalBombExplodeEffect(GetWorldPosition(p1.x, p1.y));
+            else if (p1.powerUp == PowerUpType.VerticalBomb) MatchEffectsManager.Instance.PlayVerticalBombExplodeEffect(GetWorldPosition(p1.x, p1.y));
+            else if (p1.powerUp == PowerUpType.ColorBomb) MatchEffectsManager.Instance.PlayShapeBombExplodeEffect(GetWorldPosition(p1.x, p1.y));
+
+            if (p2.powerUp == PowerUpType.HorizontalBomb) MatchEffectsManager.Instance.PlayHorizontalBombExplodeEffect(GetWorldPosition(p2.x, p2.y));
+            else if (p2.powerUp == PowerUpType.VerticalBomb) MatchEffectsManager.Instance.PlayVerticalBombExplodeEffect(GetWorldPosition(p2.x, p2.y));
+            else if (p2.powerUp == PowerUpType.ColorBomb) MatchEffectsManager.Instance.PlayShapeBombExplodeEffect(GetWorldPosition(p2.x, p2.y));
+        }
+
         // DUPLICATE REMOVAL
         // If a horizontal bomb hits a piece, AND a vertical bomb hits the exact same piece, 
         // we can't blow it up twice! Deduplicate the list using a loop.
@@ -842,7 +854,12 @@ public class GridSpawner : MonoBehaviour
                             
                             // Log the request to spawn a bomb into our Dictionary! We delay spawning it until AFTER the pieces are deleted!
                             if (!spawnBombActions.ContainsKey(coords))
-                                spawnBombActions.Add(coords, () => SpawnSpecialPrefab(cx, cy, colorBombPrefab));
+                            {
+                                spawnBombActions.Add(coords, () => {
+                                    SpawnSpecialPrefab(cx, cy, colorBombPrefab);
+                                    if (MatchEffectsManager.Instance != null) MatchEffectsManager.Instance.PlayShapeBombCreateEffect(GetWorldPosition(cx, cy));
+                                });
+                            }
                         }
                     }
                     // HORIZONTAL MATCH-4 -> Spawn Horizontal Bomb
@@ -854,7 +871,12 @@ public class GridSpawner : MonoBehaviour
                             int cx = targetSlot.x; int cy = targetSlot.y;
                             Vector2Int coords = new Vector2Int(cx, cy);
                             if (!spawnBombActions.ContainsKey(coords))
-                                spawnBombActions.Add(coords, () => SpawnSpecialPrefab(cx, cy, horizontalBombPrefab));
+                            {
+                                spawnBombActions.Add(coords, () => {
+                                    SpawnSpecialPrefab(cx, cy, horizontalBombPrefab);
+                                    if (MatchEffectsManager.Instance != null) MatchEffectsManager.Instance.PlayHorizontalBombCreateEffect(GetWorldPosition(cx, cy));
+                                });
+                            }
                         }
                     }
                     // VERTICAL MATCH-4 -> Spawn Vertical Bomb
@@ -866,7 +888,30 @@ public class GridSpawner : MonoBehaviour
                             int cx = targetSlot.x; int cy = targetSlot.y;
                             Vector2Int coords = new Vector2Int(cx, cy);
                             if (!spawnBombActions.ContainsKey(coords))
-                                spawnBombActions.Add(coords, () => SpawnSpecialPrefab(cx, cy, verticalBombPrefab));
+                            {
+                                spawnBombActions.Add(coords, () => {
+                                    SpawnSpecialPrefab(cx, cy, verticalBombPrefab);
+                                    if (MatchEffectsManager.Instance != null) MatchEffectsManager.Instance.PlayVerticalBombCreateEffect(GetWorldPosition(cx, cy));
+                                });
+                            }
+                        }
+                    }
+                    // STANDARD MATCH-3 -> No bomb, just particles!
+                    else if (match.pieces.Count >= 3)
+                    {
+                        GridPiece targetSlot = GetTargetSlotBest(match, lastSwapPos1, lastSwapPos2);
+                        if (targetSlot != null)
+                        {
+                            int cx = targetSlot.x; int cy = targetSlot.y;
+                            Vector2Int coords = new Vector2Int(cx, cy);
+                            // Standard matches don't conflict with bombs, so we don't block the dictionary if a bomb is forming nearby, 
+                            // but we do use the same dictionary to delay the particle pop until demolition finishes!
+                            if (!spawnBombActions.ContainsKey(coords))
+                            {
+                                spawnBombActions.Add(coords, () => {
+                                    if (MatchEffectsManager.Instance != null) MatchEffectsManager.Instance.PlayMatch3Effect(GetWorldPosition(cx, cy));
+                                });
+                            }
                         }
                     }
 

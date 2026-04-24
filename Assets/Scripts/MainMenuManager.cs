@@ -208,74 +208,24 @@ public class MainMenuManager : MonoBehaviour
             ShowMainMenu();
         }
 
-        // Build the lives display on the main menu
-        BuildLivesDisplay(root);
+        // Hook up the lives display
+        HookUpLivesDisplay(root);
     }
 
     /// <summary>
-    /// Builds a persistent hearts + timer display at the top of the main menu.
+    /// Hooks up the UI Toolkit elements for the hearts and timer display.
     /// </summary>
-    private void BuildLivesDisplay(VisualElement root)
+    private void HookUpLivesDisplay(VisualElement root)
     {
         if (root == null) return;
 
-        livesContainer = new VisualElement();
-        livesContainer.name = "livesDisplayContainer";
-        livesContainer.style.position = Position.Absolute;
-        livesContainer.style.top = 15;
-        livesContainer.style.right = 20;
-        livesContainer.style.alignItems = Align.FlexEnd;
-        livesContainer.style.flexDirection = FlexDirection.Column;
-        livesContainer.pickingMode = PickingMode.Ignore;
-
-        VisualElement rowContainer = new VisualElement();
-        rowContainer.style.flexDirection = FlexDirection.Row;
-        rowContainer.style.alignItems = Align.Center;
-        rowContainer.pickingMode = PickingMode.Ignore;
-
-        livesTimerLabel = new Label();
-        livesTimerLabel.style.fontSize = 24;
-        livesTimerLabel.style.color = new StyleColor(new Color(1f, 0.85f, 0.5f));
-        livesTimerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
-        livesTimerLabel.style.textShadow = new TextShadow { offset = new Vector2(1, 1), blurRadius = 2, color = Color.black };
-        livesTimerLabel.style.marginRight = 15;
-        livesTimerLabel.style.display = DisplayStyle.None; // Hidden by default
-        livesTimerLabel.pickingMode = PickingMode.Ignore;
-        rowContainer.Add(livesTimerLabel);
+        livesTimerLabel = root.Q<Label>("livesTimerLabel");
 
         int max = ProgressionManager.MAX_LIVES;
         lifeIcons = new VisualElement[max];
         for (int i = 0; i < max; i++)
         {
-            var icon = new VisualElement();
-            icon.style.width = 30;
-            icon.style.height = 30;
-            icon.style.marginLeft = 2;
-            icon.style.marginRight = 2;
-            icon.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
-            rowContainer.Add(icon);
-            lifeIcons[i] = icon;
-        }
-        
-        livesContainer.Add(rowContainer);
-
-        Label oldLivesText = root.Q<Label>("livesText");
-        if (oldLivesText != null)
-        {
-            oldLivesText.style.display = DisplayStyle.None; // Hide original text
-            VisualElement parentPill = oldLivesText.parent;
-            parentPill.Add(livesContainer);
-            
-            livesContainer.style.position = StyleKeyword.Null; // Reset absolute positioning
-            livesContainer.style.top = StyleKeyword.Null;
-            livesContainer.style.right = StyleKeyword.Null;
-            livesContainer.style.alignItems = Align.Center; // Align inside the badge
-            livesContainer.style.marginTop = 5;
-        }
-        else
-        {
-            // Fallback backward compatibility layout
-            root.Add(livesContainer);
+            lifeIcons[i] = root.Q<VisualElement>($"lifeIcon{i}");
         }
     }
 
@@ -316,10 +266,10 @@ public class MainMenuManager : MonoBehaviour
         {
             if (lives < max)
             {
-                int secondsLeft = ProgressionManager.Instance.GetSecondsUntilNextLife();
+                int secondsLeft = ProgressionManager.Instance.GetTotalSecondsUntilFullLives();
                 int minutes = secondsLeft / 60;
                 int seconds = secondsLeft % 60;
-                livesTimerLabel.text = $"Next \u2764 in {minutes:D2}:{seconds:D2}";
+                livesTimerLabel.text = $"Full \u2764 in {minutes:D2}:{seconds:D2}";
                 livesTimerLabel.style.display = DisplayStyle.Flex;
             }
             else

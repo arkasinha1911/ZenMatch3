@@ -78,6 +78,7 @@ public class AdManager : MonoBehaviour
         }
     }
 
+
     /// <summary>
     /// Shows a rewarded ad using IronSource LevelPlay SDK.
     /// </summary>

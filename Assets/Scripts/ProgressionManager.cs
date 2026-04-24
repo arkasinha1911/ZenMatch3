@@ -191,6 +191,7 @@ public class ProgressionManager : MonoBehaviour
                     float secondsPassed = (currentTick - suspendTickCount) / 1000f;
                     ProcessPassedSeconds(secondsPassed);
                 }
+                suspendTickCount = 0;
             }
         }
     }
@@ -244,6 +245,15 @@ public class ProgressionManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Returns total seconds remaining until ALL missing lives are regenerated.
+    /// </summary>
+    public int GetTotalSecondsUntilFullLives()
+    {
+        if (currentLives >= MAX_LIVES) return 0;
+        return Mathf.Max(0, (int)activeRegenTimer);
+    }
+
+    /// <summary>
     /// Call this when the player fails a level.
     /// Each lost life adds 30 minutes to the regeneration timer.
     /// </summary>
@@ -292,6 +302,11 @@ public class ProgressionManager : MonoBehaviour
         
         currentLives++;
         PlayerPrefs.SetInt(LIVES_KEY, currentLives);
+        
+        // Decrease the timer by 30 minutes since we just gained a life!
+        activeRegenTimer -= LIFE_REGEN_SECONDS;
+        if (activeRegenTimer < 0) activeRegenTimer = 0;
+        PlayerPrefs.SetFloat("ActiveRegenTimer", activeRegenTimer);
         
         if (currentLives >= MAX_LIVES)
         {
